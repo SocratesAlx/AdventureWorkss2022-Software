@@ -86,30 +86,34 @@ namespace SokProodos
 
 
         // ton exei piei
+        // Partial replacement of InsertSeller method with Email and Phone support
+        // Updated InsertSeller method with transaction, email/phone, and correct Employee order
         private void InsertSeller(string sellerName, decimal salesQuota, decimal bonus, decimal commissionPct, decimal salesYTD, decimal salesLastYear, int territoryId)
         {
+            string email = textBoxEmail.Text.Trim();
+            string phone = textBoxPhoneNumber.Text.Trim();
+
             string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
+                connection.Open();
+                SqlTransaction transaction = connection.BeginTransaction();
+
                 try
                 {
-                    connection.Open();
-
-                    
                     string businessEntityQuery = "INSERT INTO Person.BusinessEntity (rowguid, ModifiedDate) VALUES (NEWID(), GETDATE()); SELECT SCOPE_IDENTITY();";
                     int businessEntityId;
-                    using (SqlCommand businessCmd = new SqlCommand(businessEntityQuery, connection))
+                    using (SqlCommand businessCmd = new SqlCommand(businessEntityQuery, connection, transaction))
                     {
                         businessEntityId = Convert.ToInt32(businessCmd.ExecuteScalar());
                     }
 
-                    
                     string personQuery = @"
-            INSERT INTO Person.Person (BusinessEntityID, PersonType, FirstName, LastName, ModifiedDate)
-            VALUES (@BusinessEntityID, 'EM', @FirstName, @LastName, GETDATE());";
+                INSERT INTO Person.Person (BusinessEntityID, PersonType, FirstName, LastName, ModifiedDate)
+                VALUES (@BusinessEntityID, 'EM', @FirstName, @LastName, GETDATE());";
 
-                    using (SqlCommand personCmd = new SqlCommand(personQuery, connection))
+                    using (SqlCommand personCmd = new SqlCommand(personQuery, connection, transaction))
                     {
                         personCmd.Parameters.AddWithValue("@BusinessEntityID", businessEntityId);
                         personCmd.Parameters.AddWithValue("@FirstName", sellerName.Split(' ')[0]);
@@ -117,27 +121,52 @@ namespace SokProodos
                         personCmd.ExecuteNonQuery();
                     }
 
-                    
+                    if (!string.IsNullOrWhiteSpace(email))
+                    {
+                        string emailQuery = @"
+                    INSERT INTO Person.EmailAddress (BusinessEntityID, EmailAddress)
+                    VALUES (@BusinessEntityID, @Email);";
+
+                        using (SqlCommand emailCmd = new SqlCommand(emailQuery, connection, transaction))
+                        {
+                            emailCmd.Parameters.AddWithValue("@BusinessEntityID", businessEntityId);
+                            emailCmd.Parameters.AddWithValue("@Email", email);
+                            emailCmd.ExecuteNonQuery();
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(phone))
+                    {
+                        string phoneQuery = @"
+                    INSERT INTO Person.PersonPhone (BusinessEntityID, PhoneNumber, PhoneNumberTypeID)
+                    VALUES (@BusinessEntityID, @PhoneNumber, 1);";
+
+                        using (SqlCommand phoneCmd = new SqlCommand(phoneQuery, connection, transaction))
+                        {
+                            phoneCmd.Parameters.AddWithValue("@BusinessEntityID", businessEntityId);
+                            phoneCmd.Parameters.AddWithValue("@PhoneNumber", phone);
+                            phoneCmd.ExecuteNonQuery();
+                        }
+                    }
+
                     string uniqueNationalID = new Random().Next(100000000, 999999999).ToString();
 
                     string employeeQuery = @"
-INSERT INTO HumanResources.Employee (BusinessEntityID, NationalIDNumber, LoginID, JobTitle, BirthDate, MaritalStatus, Gender, HireDate)
-VALUES (@BusinessEntityID, @NationalIDNumber, 'adventure-works\seller' + CAST(@BusinessEntityID AS NVARCHAR), 'Sales Representative', '1990-01-01', 'S', 'M', GETDATE());";
+                INSERT INTO HumanResources.Employee (BusinessEntityID, NationalIDNumber, LoginID, JobTitle, BirthDate, MaritalStatus, Gender, HireDate)
+                VALUES (@BusinessEntityID, @NationalIDNumber, 'adventure-works\\seller' + CAST(@BusinessEntityID AS NVARCHAR), 'Sales Representative', '1990-01-01', 'S', 'M', GETDATE());";
 
-                    using (SqlCommand employeeCmd = new SqlCommand(employeeQuery, connection))
+                    using (SqlCommand employeeCmd = new SqlCommand(employeeQuery, connection, transaction))
                     {
                         employeeCmd.Parameters.AddWithValue("@BusinessEntityID", businessEntityId);
-                        employeeCmd.Parameters.AddWithValue("@NationalIDNumber", uniqueNationalID); 
+                        employeeCmd.Parameters.AddWithValue("@NationalIDNumber", uniqueNationalID);
                         employeeCmd.ExecuteNonQuery();
                     }
 
-
-                    
                     string sellerQuery = @"
-            INSERT INTO Sales.SalesPerson (BusinessEntityID, SalesQuota, Bonus, CommissionPct, SalesYTD, SalesLastYear, TerritoryID, rowguid, ModifiedDate)
-            VALUES (@BusinessEntityID, @SalesQuota, @Bonus, @CommissionPct, @SalesYTD, @SalesLastYear, @TerritoryID, NEWID(), GETDATE());";
+                INSERT INTO Sales.SalesPerson (BusinessEntityID, SalesQuota, Bonus, CommissionPct, SalesYTD, SalesLastYear, TerritoryID, rowguid, ModifiedDate)
+                VALUES (@BusinessEntityID, @SalesQuota, @Bonus, @CommissionPct, @SalesYTD, @SalesLastYear, @TerritoryID, NEWID(), GETDATE());";
 
-                    using (SqlCommand sellerCmd = new SqlCommand(sellerQuery, connection))
+                    using (SqlCommand sellerCmd = new SqlCommand(sellerQuery, connection, transaction))
                     {
                         sellerCmd.Parameters.AddWithValue("@BusinessEntityID", businessEntityId);
                         sellerCmd.Parameters.AddWithValue("@SalesQuota", salesQuota);
@@ -149,19 +178,22 @@ VALUES (@BusinessEntityID, @NationalIDNumber, 'adventure-works\seller' + CAST(@B
                         sellerCmd.ExecuteNonQuery();
                     }
 
+                    transaction.Commit();
                     MessageBox.Show("Seller added successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    
                     textBoxSellerName.Clear();
                     textBoxSalesQuota.Clear();
                     textBoxBonus.Clear();
                     textBoxCommissionPct.Clear();
                     textBoxSalesYTD.Clear();
                     textBoxSalesLastYear.Clear();
+                    textBoxEmail.Clear();
+                    textBoxPhoneNumber.Clear();
                     comboBoxTerritory.SelectedIndex = -1;
                 }
                 catch (Exception ex)
                 {
+                    transaction.Rollback();
                     MessageBox.Show("Database error: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -189,7 +221,6 @@ VALUES (@BusinessEntityID, @NationalIDNumber, 'adventure-works\seller' + CAST(@B
                 return;
             }
 
-            
             int territoryId = comboBoxTerritoryID.SelectedItem != null
                 ? ((KeyValuePair<int, string>)comboBoxTerritoryID.SelectedItem).Key
                 : 0;
@@ -200,49 +231,10 @@ VALUES (@BusinessEntityID, @NationalIDNumber, 'adventure-works\seller' + CAST(@B
                 return;
             }
 
-            string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
-
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                try
-                {
-                    connection.Open();
-
-                    string insertQuery = @"
-                INSERT INTO Sales.SalesPerson (BusinessEntityID, SalesQuota, Bonus, CommissionPct, SalesYTD, SalesLastYear, TerritoryID, rowguid, ModifiedDate)
-                VALUES (@SellerID, @SalesQuota, @Bonus, @CommissionPct, @SalesYTD, @SalesLastYear, @TerritoryID, NEWID(), GETDATE());";
-
-                    using (SqlCommand cmd = new SqlCommand(insertQuery, connection))
-                    {
-                        cmd.Parameters.AddWithValue("@SellerID", textBoxSellerID.Text); // Ensure this is populated correctly
-                        cmd.Parameters.AddWithValue("@SalesQuota", salesQuota);
-                        cmd.Parameters.AddWithValue("@Bonus", bonus);
-                        cmd.Parameters.AddWithValue("@CommissionPct", commissionPct);
-                        cmd.Parameters.AddWithValue("@SalesYTD", salesYTD);
-                        cmd.Parameters.AddWithValue("@SalesLastYear", salesLastYear);
-                        cmd.Parameters.AddWithValue("@TerritoryID", territoryId);
-                        cmd.ExecuteNonQuery();
-                    }
-
-                    MessageBox.Show("Seller added successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    // Reset Fields
-                    textBoxSellerID.Clear();
-                    textBoxSellerName.Clear();
-                    textBoxSalesQuota.Clear();
-                    textBoxBonus.Clear();
-                    textBoxCommissionPct.Clear();
-                    textBoxSalesYTD.Clear();
-                    textBoxSalesLastYear.Clear();
-                    comboBoxTerritoryID.SelectedIndex = -1;
-                    comboBoxTerritory.SelectedIndex = -1;
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error adding seller: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
+            // ✅ Call updated InsertSeller method (now handles email & phone internally)
+            InsertSeller(sellerName, salesQuota, bonus, commissionPct, salesYTD, salesLastYear, territoryId);
         }
+
 
 
 
@@ -292,20 +284,25 @@ VALUES (@BusinessEntityID, @NationalIDNumber, 'adventure-works\seller' + CAST(@B
                 ? ((KeyValuePair<int, string>)comboBoxTerritoryID.SelectedItem).Key
                 : 0;
 
+            string email = textBoxEmail.Text.Trim();
+            string phone = textBoxPhoneNumber.Text.Trim();
+
             string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
+                connection.Open();
+                SqlTransaction transaction = connection.BeginTransaction();
+
                 try
                 {
-                    connection.Open();
-                    string updateQuery = @"
+                    string updateSalesQuery = @"
                 UPDATE Sales.SalesPerson
                 SET SalesQuota = @SalesQuota, Bonus = @Bonus, CommissionPct = @CommissionPct,
                     SalesYTD = @SalesYTD, SalesLastYear = @SalesLastYear, TerritoryID = @TerritoryID, ModifiedDate = GETDATE()
                 WHERE BusinessEntityID = @SellerID";
 
-                    using (SqlCommand cmd = new SqlCommand(updateQuery, connection))
+                    using (SqlCommand cmd = new SqlCommand(updateSalesQuery, connection, transaction))
                     {
                         cmd.Parameters.AddWithValue("@SellerID", sellerID);
                         cmd.Parameters.AddWithValue("@SalesQuota", salesQuota);
@@ -317,14 +314,44 @@ VALUES (@BusinessEntityID, @NationalIDNumber, 'adventure-works\seller' + CAST(@B
                         cmd.ExecuteNonQuery();
                     }
 
+                    string emailQuery = @"
+                IF EXISTS (SELECT 1 FROM Person.EmailAddress WHERE BusinessEntityID = @SellerID)
+                    UPDATE Person.EmailAddress SET EmailAddress = @Email WHERE BusinessEntityID = @SellerID
+                ELSE
+                    INSERT INTO Person.EmailAddress (BusinessEntityID, EmailAddress) VALUES (@SellerID, @Email);";
+
+                    using (SqlCommand cmd = new SqlCommand(emailQuery, connection, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@SellerID", sellerID);
+                        cmd.Parameters.AddWithValue("@Email", string.IsNullOrWhiteSpace(email) ? DBNull.Value : (object)email);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    string phoneQuery = @"
+                IF EXISTS (SELECT 1 FROM Person.PersonPhone WHERE BusinessEntityID = @SellerID)
+                    UPDATE Person.PersonPhone SET PhoneNumber = @Phone WHERE BusinessEntityID = @SellerID
+                ELSE
+                    INSERT INTO Person.PersonPhone (BusinessEntityID, PhoneNumber, PhoneNumberTypeID)
+                    VALUES (@SellerID, @Phone, 1);";
+
+                    using (SqlCommand cmd = new SqlCommand(phoneQuery, connection, transaction))
+                    {
+                        cmd.Parameters.AddWithValue("@SellerID", sellerID);
+                        cmd.Parameters.AddWithValue("@Phone", string.IsNullOrWhiteSpace(phone) ? DBNull.Value : (object)phone);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    transaction.Commit();
                     MessageBox.Show("Seller updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
+                    transaction.Rollback();
                     MessageBox.Show("Error updating seller: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
+
 
 
         private void buttonFill_Click(object sender, EventArgs e)
@@ -351,9 +378,13 @@ VALUES (@BusinessEntityID, @NationalIDNumber, 'adventure-works\seller' + CAST(@B
                     sp.CommissionPct,
                     sp.SalesYTD,
                     sp.SalesLastYear,
-                    sp.TerritoryID
+                    sp.TerritoryID,
+                    ea.EmailAddress,
+                    ph.PhoneNumber
                 FROM Sales.SalesPerson sp
                 JOIN Person.Person p ON sp.BusinessEntityID = p.BusinessEntityID
+                LEFT JOIN Person.EmailAddress ea ON p.BusinessEntityID = ea.BusinessEntityID
+                LEFT JOIN Person.PersonPhone ph ON p.BusinessEntityID = ph.BusinessEntityID
                 WHERE sp.BusinessEntityID = @SellerID;";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
@@ -370,17 +401,14 @@ VALUES (@BusinessEntityID, @NationalIDNumber, 'adventure-works\seller' + CAST(@B
                                 textBoxCommissionPct.Text = reader["CommissionPct"].ToString();
                                 textBoxSalesYTD.Text = reader["SalesYTD"].ToString();
                                 textBoxSalesLastYear.Text = reader["SalesLastYear"].ToString();
+                                textBoxEmail.Text = reader["EmailAddress"] != DBNull.Value ? reader["EmailAddress"].ToString() : "";
+                                textBoxPhoneNumber.Text = reader["PhoneNumber"] != DBNull.Value ? reader["PhoneNumber"].ToString() : "";
 
-                                
                                 if (reader["TerritoryID"] != DBNull.Value)
                                 {
                                     int territoryID = Convert.ToInt32(reader["TerritoryID"]);
-
-                                    
                                     comboBoxTerritoryID.SelectedItem = comboBoxTerritoryID.Items.Cast<KeyValuePair<int, string>>()
                                         .FirstOrDefault(kvp => kvp.Key == territoryID);
-
-                                    
                                     comboBoxTerritory.SelectedItem = comboBoxTerritory.Items.Cast<KeyValuePair<int, string>>()
                                         .FirstOrDefault(kvp => kvp.Key == territoryID);
                                 }
@@ -405,6 +433,7 @@ VALUES (@BusinessEntityID, @NationalIDNumber, 'adventure-works\seller' + CAST(@B
                 }
             }
         }
+
 
 
 

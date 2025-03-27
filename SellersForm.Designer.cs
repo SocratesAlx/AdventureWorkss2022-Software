@@ -52,6 +52,10 @@
             this.buttonUpdate = new System.Windows.Forms.Button();
             this.buttonFill = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.textBoxEmail = new System.Windows.Forms.TextBox();
+            this.textBoxPhoneNumber = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -60,7 +64,7 @@
             // 
             this.labelSellerName.AutoSize = true;
             this.labelSellerName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelSellerName.Location = new System.Drawing.Point(25, 25);
+            this.labelSellerName.Location = new System.Drawing.Point(18, 22);
             this.labelSellerName.Name = "labelSellerName";
             this.labelSellerName.Size = new System.Drawing.Size(95, 20);
             this.labelSellerName.TabIndex = 0;
@@ -77,7 +81,7 @@
             // 
             this.labelSalesQuota.AutoSize = true;
             this.labelSalesQuota.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelSalesQuota.Location = new System.Drawing.Point(26, 60);
+            this.labelSalesQuota.Location = new System.Drawing.Point(18, 56);
             this.labelSalesQuota.Name = "labelSalesQuota";
             this.labelSalesQuota.Size = new System.Drawing.Size(97, 20);
             this.labelSalesQuota.TabIndex = 2;
@@ -94,7 +98,7 @@
             // 
             this.labelBonus.AutoSize = true;
             this.labelBonus.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelBonus.Location = new System.Drawing.Point(18, 91);
+            this.labelBonus.Location = new System.Drawing.Point(18, 88);
             this.labelBonus.Name = "labelBonus";
             this.labelBonus.Size = new System.Drawing.Size(115, 20);
             this.labelBonus.TabIndex = 4;
@@ -111,7 +115,7 @@
             // 
             this.labelCommissionPct.AutoSize = true;
             this.labelCommissionPct.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCommissionPct.Location = new System.Drawing.Point(19, 129);
+            this.labelCommissionPct.Location = new System.Drawing.Point(19, 120);
             this.labelCommissionPct.Name = "labelCommissionPct";
             this.labelCommissionPct.Size = new System.Drawing.Size(123, 20);
             this.labelCommissionPct.TabIndex = 6;
@@ -119,7 +123,7 @@
             // 
             // textBoxCommissionPct
             // 
-            this.textBoxCommissionPct.Location = new System.Drawing.Point(143, 129);
+            this.textBoxCommissionPct.Location = new System.Drawing.Point(143, 123);
             this.textBoxCommissionPct.Name = "textBoxCommissionPct";
             this.textBoxCommissionPct.Size = new System.Drawing.Size(144, 22);
             this.textBoxCommissionPct.TabIndex = 7;
@@ -128,7 +132,7 @@
             // 
             this.labelSalesYTD.AutoSize = true;
             this.labelSalesYTD.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelSalesYTD.Location = new System.Drawing.Point(18, 170);
+            this.labelSalesYTD.Location = new System.Drawing.Point(18, 151);
             this.labelSalesYTD.Name = "labelSalesYTD";
             this.labelSalesYTD.Size = new System.Drawing.Size(120, 20);
             this.labelSalesYTD.TabIndex = 8;
@@ -136,7 +140,7 @@
             // 
             // textBoxSalesYTD
             // 
-            this.textBoxSalesYTD.Location = new System.Drawing.Point(142, 170);
+            this.textBoxSalesYTD.Location = new System.Drawing.Point(142, 153);
             this.textBoxSalesYTD.Name = "textBoxSalesYTD";
             this.textBoxSalesYTD.Size = new System.Drawing.Size(144, 22);
             this.textBoxSalesYTD.TabIndex = 9;
@@ -145,7 +149,7 @@
             // 
             this.labelSalesLastYear.AutoSize = true;
             this.labelSalesLastYear.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelSalesLastYear.Location = new System.Drawing.Point(18, 207);
+            this.labelSalesLastYear.Location = new System.Drawing.Point(18, 180);
             this.labelSalesLastYear.Name = "labelSalesLastYear";
             this.labelSalesLastYear.Size = new System.Drawing.Size(122, 20);
             this.labelSalesLastYear.TabIndex = 10;
@@ -153,7 +157,7 @@
             // 
             // textBoxSalesLastYear
             // 
-            this.textBoxSalesLastYear.Location = new System.Drawing.Point(143, 207);
+            this.textBoxSalesLastYear.Location = new System.Drawing.Point(143, 181);
             this.textBoxSalesLastYear.Name = "textBoxSalesLastYear";
             this.textBoxSalesLastYear.Size = new System.Drawing.Size(144, 22);
             this.textBoxSalesLastYear.TabIndex = 11;
@@ -162,7 +166,7 @@
             // 
             this.labelTerritory.AutoSize = true;
             this.labelTerritory.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTerritory.Location = new System.Drawing.Point(25, 243);
+            this.labelTerritory.Location = new System.Drawing.Point(18, 210);
             this.labelTerritory.Name = "labelTerritory";
             this.labelTerritory.Size = new System.Drawing.Size(110, 20);
             this.labelTerritory.TabIndex = 12;
@@ -171,7 +175,7 @@
             // comboBoxTerritory
             // 
             this.comboBoxTerritory.FormattingEnabled = true;
-            this.comboBoxTerritory.Location = new System.Drawing.Point(143, 243);
+            this.comboBoxTerritory.Location = new System.Drawing.Point(143, 209);
             this.comboBoxTerritory.Name = "comboBoxTerritory";
             this.comboBoxTerritory.Size = new System.Drawing.Size(144, 24);
             this.comboBoxTerritory.TabIndex = 13;
@@ -205,6 +209,10 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.textBoxPhoneNumber);
+            this.groupBox1.Controls.Add(this.textBoxEmail);
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.labelSellerID);
             this.groupBox1.Controls.Add(this.textBoxSellerID);
             this.groupBox1.Controls.Add(this.labelTerritoryID);
@@ -224,9 +232,9 @@
             this.groupBox1.Controls.Add(this.textBoxCommissionPct);
             this.groupBox1.Controls.Add(this.labelSalesYTD);
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(247, 28);
+            this.groupBox1.Location = new System.Drawing.Point(262, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(356, 367);
+            this.groupBox1.Size = new System.Drawing.Size(326, 380);
             this.groupBox1.TabIndex = 16;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Seller Details";
@@ -235,7 +243,7 @@
             // 
             this.labelSellerID.AutoSize = true;
             this.labelSellerID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelSellerID.Location = new System.Drawing.Point(35, 324);
+            this.labelSellerID.Location = new System.Drawing.Point(19, 276);
             this.labelSellerID.Name = "labelSellerID";
             this.labelSellerID.Size = new System.Drawing.Size(70, 20);
             this.labelSellerID.TabIndex = 17;
@@ -243,7 +251,7 @@
             // 
             // textBoxSellerID
             // 
-            this.textBoxSellerID.Location = new System.Drawing.Point(142, 324);
+            this.textBoxSellerID.Location = new System.Drawing.Point(142, 276);
             this.textBoxSellerID.Name = "textBoxSellerID";
             this.textBoxSellerID.Size = new System.Drawing.Size(144, 22);
             this.textBoxSellerID.TabIndex = 16;
@@ -253,7 +261,7 @@
             // 
             this.labelTerritoryID.AutoSize = true;
             this.labelTerritoryID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTerritoryID.Location = new System.Drawing.Point(32, 282);
+            this.labelTerritoryID.Location = new System.Drawing.Point(19, 242);
             this.labelTerritoryID.Name = "labelTerritoryID";
             this.labelTerritoryID.Size = new System.Drawing.Size(87, 20);
             this.labelTerritoryID.TabIndex = 15;
@@ -262,7 +270,7 @@
             // comboBoxTerritoryID
             // 
             this.comboBoxTerritoryID.FormattingEnabled = true;
-            this.comboBoxTerritoryID.Location = new System.Drawing.Point(142, 282);
+            this.comboBoxTerritoryID.Location = new System.Drawing.Point(142, 242);
             this.comboBoxTerritoryID.Name = "comboBoxTerritoryID";
             this.comboBoxTerritoryID.Size = new System.Drawing.Size(144, 24);
             this.comboBoxTerritoryID.TabIndex = 14;
@@ -303,6 +311,40 @@
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 19;
             this.pictureBox1.TabStop = false;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(19, 307);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(48, 20);
+            this.label1.TabIndex = 18;
+            this.label1.Text = "Email";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(19, 339);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(83, 20);
+            this.label2.TabIndex = 19;
+            this.label2.Text = "Phone No.";
+            // 
+            // textBoxEmail
+            // 
+            this.textBoxEmail.Location = new System.Drawing.Point(142, 305);
+            this.textBoxEmail.Name = "textBoxEmail";
+            this.textBoxEmail.Size = new System.Drawing.Size(144, 22);
+            this.textBoxEmail.TabIndex = 20;
+            // 
+            // textBoxPhoneNumber
+            // 
+            this.textBoxPhoneNumber.Location = new System.Drawing.Point(142, 339);
+            this.textBoxPhoneNumber.Name = "textBoxPhoneNumber";
+            this.textBoxPhoneNumber.Size = new System.Drawing.Size(144, 22);
+            this.textBoxPhoneNumber.TabIndex = 21;
             // 
             // SellersForm
             // 
@@ -351,5 +393,9 @@
         private System.Windows.Forms.Label labelSellerID;
         private System.Windows.Forms.TextBox textBoxSellerID;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.TextBox textBoxPhoneNumber;
+        private System.Windows.Forms.TextBox textBoxEmail;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
     }
 }

@@ -44,6 +44,12 @@
             this.buttonUpdate = new System.Windows.Forms.Button();
             this.buttonFill = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.labelEmail = new System.Windows.Forms.Label();
+            this.textBoxEmail = new System.Windows.Forms.TextBox();
+            this.textBoxPhone = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.textBoxAddress = new System.Windows.Forms.TextBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -62,7 +68,7 @@
             // 
             this.labelCreditRating.AutoSize = true;
             this.labelCreditRating.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelCreditRating.Location = new System.Drawing.Point(32, 102);
+            this.labelCreditRating.Location = new System.Drawing.Point(31, 75);
             this.labelCreditRating.Name = "labelCreditRating";
             this.labelCreditRating.Size = new System.Drawing.Size(102, 20);
             this.labelCreditRating.TabIndex = 1;
@@ -78,7 +84,7 @@
             // comboBoxCreditRating
             // 
             this.comboBoxCreditRating.FormattingEnabled = true;
-            this.comboBoxCreditRating.Location = new System.Drawing.Point(183, 94);
+            this.comboBoxCreditRating.Location = new System.Drawing.Point(183, 71);
             this.comboBoxCreditRating.Name = "comboBoxCreditRating";
             this.comboBoxCreditRating.Size = new System.Drawing.Size(127, 24);
             this.comboBoxCreditRating.TabIndex = 3;
@@ -87,7 +93,7 @@
             // 
             this.labelPreferred.AutoSize = true;
             this.labelPreferred.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelPreferred.Location = new System.Drawing.Point(33, 157);
+            this.labelPreferred.Location = new System.Drawing.Point(31, 115);
             this.labelPreferred.Name = "labelPreferred";
             this.labelPreferred.Size = new System.Drawing.Size(131, 20);
             this.labelPreferred.TabIndex = 4;
@@ -96,7 +102,7 @@
             // checkBoxPreferred
             // 
             this.checkBoxPreferred.AutoSize = true;
-            this.checkBoxPreferred.Location = new System.Drawing.Point(248, 156);
+            this.checkBoxPreferred.Location = new System.Drawing.Point(183, 120);
             this.checkBoxPreferred.Name = "checkBoxPreferred";
             this.checkBoxPreferred.Size = new System.Drawing.Size(15, 14);
             this.checkBoxPreferred.TabIndex = 5;
@@ -106,7 +112,7 @@
             // 
             this.labelActive.AutoSize = true;
             this.labelActive.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelActive.Location = new System.Drawing.Point(34, 207);
+            this.labelActive.Location = new System.Drawing.Point(30, 149);
             this.labelActive.Name = "labelActive";
             this.labelActive.Size = new System.Drawing.Size(114, 20);
             this.labelActive.TabIndex = 6;
@@ -115,7 +121,7 @@
             // checkBoxActive
             // 
             this.checkBoxActive.AutoSize = true;
-            this.checkBoxActive.Location = new System.Drawing.Point(248, 206);
+            this.checkBoxActive.Location = new System.Drawing.Point(183, 149);
             this.checkBoxActive.Name = "checkBoxActive";
             this.checkBoxActive.Size = new System.Drawing.Size(15, 14);
             this.checkBoxActive.TabIndex = 7;
@@ -125,7 +131,7 @@
             // 
             this.labelWebsite.AutoSize = true;
             this.labelWebsite.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelWebsite.Location = new System.Drawing.Point(34, 270);
+            this.labelWebsite.Location = new System.Drawing.Point(31, 186);
             this.labelWebsite.Name = "labelWebsite";
             this.labelWebsite.Size = new System.Drawing.Size(67, 20);
             this.labelWebsite.TabIndex = 8;
@@ -133,7 +139,7 @@
             // 
             // textBoxWebsite
             // 
-            this.textBoxWebsite.Location = new System.Drawing.Point(183, 270);
+            this.textBoxWebsite.Location = new System.Drawing.Point(183, 184);
             this.textBoxWebsite.Name = "textBoxWebsite";
             this.textBoxWebsite.Size = new System.Drawing.Size(127, 22);
             this.textBoxWebsite.TabIndex = 9;
@@ -166,6 +172,12 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.textBoxAddress);
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.textBoxPhone);
+            this.groupBox1.Controls.Add(this.textBoxEmail);
+            this.groupBox1.Controls.Add(this.labelEmail);
             this.groupBox1.Controls.Add(this.labelSupplierName);
             this.groupBox1.Controls.Add(this.labelCreditRating);
             this.groupBox1.Controls.Add(this.textBoxSupplierName);
@@ -220,6 +232,57 @@
             this.pictureBox1.TabIndex = 15;
             this.pictureBox1.TabStop = false;
             // 
+            // labelEmail
+            // 
+            this.labelEmail.AutoSize = true;
+            this.labelEmail.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelEmail.Location = new System.Drawing.Point(30, 224);
+            this.labelEmail.Name = "labelEmail";
+            this.labelEmail.Size = new System.Drawing.Size(48, 20);
+            this.labelEmail.TabIndex = 10;
+            this.labelEmail.Text = "Email";
+            // 
+            // textBoxEmail
+            // 
+            this.textBoxEmail.Location = new System.Drawing.Point(183, 224);
+            this.textBoxEmail.Name = "textBoxEmail";
+            this.textBoxEmail.Size = new System.Drawing.Size(127, 22);
+            this.textBoxEmail.TabIndex = 11;
+            // 
+            // textBoxPhone
+            // 
+            this.textBoxPhone.Location = new System.Drawing.Point(183, 261);
+            this.textBoxPhone.Name = "textBoxPhone";
+            this.textBoxPhone.Size = new System.Drawing.Size(127, 22);
+            this.textBoxPhone.TabIndex = 12;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(30, 260);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(83, 20);
+            this.label1.TabIndex = 13;
+            this.label1.Text = "Phone No.";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(30, 299);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(68, 20);
+            this.label2.TabIndex = 14;
+            this.label2.Text = "Address";
+            // 
+            // textBoxAddress
+            // 
+            this.textBoxAddress.Location = new System.Drawing.Point(183, 299);
+            this.textBoxAddress.Name = "textBoxAddress";
+            this.textBoxAddress.Size = new System.Drawing.Size(127, 22);
+            this.textBoxAddress.TabIndex = 15;
+            // 
             // SupplierForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -259,5 +322,11 @@
         private System.Windows.Forms.Button buttonUpdate;
         private System.Windows.Forms.Button buttonFill;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Label labelEmail;
+        private System.Windows.Forms.TextBox textBoxAddress;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox textBoxPhone;
+        private System.Windows.Forms.TextBox textBoxEmail;
     }
 }

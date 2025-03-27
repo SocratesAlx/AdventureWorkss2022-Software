@@ -84,10 +84,7 @@ namespace SokProodos
             }
         }
 
-
-        // ton exei piei
-        // Partial replacement of InsertSeller method with Email and Phone support
-        // Updated InsertSeller method with transaction, email/phone, and correct Employee order
+     
         private void InsertSeller(string sellerName, decimal salesQuota, decimal bonus, decimal commissionPct, decimal salesYTD, decimal salesLastYear, int territoryId)
         {
             string email = textBoxEmail.Text.Trim();

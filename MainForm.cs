@@ -374,7 +374,7 @@ namespace SokProodos
                 Text = $"Stock - {timeRangeText}",
                 Font = new Font("Arial", 10, FontStyle.Bold),
                 ForeColor = Color.Black,
-                Location = new Point(480, 80), // shifted right
+                Location = new Point(480, 80), 
                 AutoSize = true
             };
             panelDashboard.Controls.Add(lblStock);
@@ -384,7 +384,7 @@ namespace SokProodos
             chartStock.Series["Stock"]["PieLabelStyle"] = "Disabled";
             chartStock.Legends[0].Enabled = true;
             chartStock.Legends[0].Docking = Docking.Bottom;
-            chartStock.Location = new Point(480, 100); // shifted right
+            chartStock.Location = new Point(480, 100); 
             chartStock.Size = new Size(450, 200);
             panelDashboard.Controls.Add(chartStock);
 

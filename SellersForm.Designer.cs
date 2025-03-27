@@ -232,7 +232,7 @@
             this.groupBox1.Controls.Add(this.textBoxCommissionPct);
             this.groupBox1.Controls.Add(this.labelSalesYTD);
             this.groupBox1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(262, 12);
+            this.groupBox1.Location = new System.Drawing.Point(262, 13);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(326, 380);
             this.groupBox1.TabIndex = 16;

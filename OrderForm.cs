@@ -59,12 +59,12 @@ namespace SokProodos
             Color buttonColor = Color.FromArgb(0, 160, 255);
             Color hoverColor = Color.FromArgb(0, 140, 220);
 
-            // Positioning adjustments
-            int startX = 850;  // Change X if the buttons are off the screen
-            int startY = 400;  // Move Y down if buttons are getting cut off (adjust as needed)
+            // Positioning 
+            int startX = 850;  
+            int startY = 400; 
             int buttonWidth = 150;
             int buttonHeight = 36;
-            int spacing = 20;  // Increase spacing between buttons
+            int spacing = 20;  
 
             void AddStyledButton(string text, EventHandler onClick)
             {
@@ -93,11 +93,11 @@ namespace SokProodos
                 btn.Click += onClick;
 
                 this.Controls.Add(btn);
-                startY += buttonHeight + spacing; // Increase spacing if buttons get cut off
+                startY += buttonHeight + spacing; 
                 btn.BringToFront();
             }
 
-            // Add buttons to form
+            // nea buttons sto form
             AddStyledButton("Find Billing Address", buttonFindBillingAddress_Click);
             AddStyledButton("Add To Invoice", buttonAddToOrder_Click);
             AddStyledButton("Complete Order", buttonCompleteOrder_Click);
@@ -106,12 +106,12 @@ namespace SokProodos
 
         private void Button_MouseEnter(object sender, EventArgs e)
         {
-            ((Button)sender).BackColor = Color.FromArgb(114, 137, 218); // Lighter blue on hover
+            ((Button)sender).BackColor = Color.FromArgb(114, 137, 218); // poio anoixto ble
         }
 
         private void Button_MouseLeave(object sender, EventArgs e)
         {
-            ((Button)sender).BackColor = Color.FromArgb(88, 101, 242); // Normal state
+            ((Button)sender).BackColor = Color.FromArgb(88, 101, 242); // kanoniko tou state
         }
 
 
@@ -148,7 +148,7 @@ namespace SokProodos
 
         private void LoadCustomerBillingAddress(int customerId)
         {
-            textBoxBillingAddress.Text = ""; // Clear before searching
+            textBoxBillingAddress.Text = ""; // Clear prin thn anazhthsh
 
             string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
 
@@ -171,22 +171,22 @@ namespace SokProodos
 
                     if (result != null)
                     {
-                        textBoxBillingAddress.Text = result.ToString();  // ✅ Fill billing address textbox
-                        textBoxBillingAddress.Refresh(); // Force UI update
+                        textBoxBillingAddress.Text = result.ToString();  
+                        textBoxBillingAddress.Refresh(); 
                     }
                     else
                     {
-                        textBoxBillingAddress.Text = "";  // ❌ No address found
+                        textBoxBillingAddress.Text = "";  
                         MessageBox.Show("No billing address found for this customer!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
                 }
             }
         }
 
-
+        // billing address method test
         private void LoadBillingAddressForCustomer(int customerId)
         {
-            textBoxBillingAddress.Text = ""; // Clear previous data
+            textBoxBillingAddress.Text = ""; 
 
             string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
 
@@ -194,7 +194,7 @@ namespace SokProodos
             {
                 connection.Open();
 
-                // First, retrieve the BusinessEntityID for this customer
+                
                 string query = @"
             SELECT c.PersonID 
             FROM Sales.Customer c
@@ -217,13 +217,13 @@ namespace SokProodos
                     return;
                 }
 
-                // Now, find the Billing Address from BusinessEntityAddress
+                
                 query = @"
             SELECT a.AddressLine1 + ', ' + a.City AS BillingAddress
             FROM Person.BusinessEntityAddress bea
             JOIN Person.Address a ON bea.AddressID = a.AddressID
             WHERE bea.BusinessEntityID = @BusinessEntityID
-            AND bea.AddressTypeID = 1";  // AddressTypeID = 1 is Billing Address
+            AND bea.AddressTypeID = 1";  
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 {
@@ -232,7 +232,7 @@ namespace SokProodos
 
                     if (result != null)
                     {
-                        textBoxBillingAddress.Text = result.ToString();  // ✅ Fill the billing address textbox
+                        textBoxBillingAddress.Text = result.ToString();  
                     }
                     else
                     {
@@ -241,11 +241,6 @@ namespace SokProodos
                 }
             }
         }
-
-
-
-
-
 
 
         private Dictionary<int, int> customerBillingAddresses = new Dictionary<int, int>();
@@ -281,10 +276,10 @@ namespace SokProodos
                         string customerName = reader.GetString(1);
                         int billToAddressId = reader.IsDBNull(2) ? 0 : reader.GetInt32(2);
 
-                        // ✅ Store billing address ID (NO POPUP!)
+                        
                         customerBillingAddresses[customerId] = billToAddressId;
 
-                        // ✅ Add customer to combo box
+                        
                         comboBoxCustomer.Items.Add(new KeyValuePair<int, string>(customerId, customerName));
                     }
                 }
@@ -345,7 +340,7 @@ namespace SokProodos
                 return;
             }
 
-            // ✅ Debug: Confirm event fires
+            
             MessageBox.Show("Customer Selected Event Triggered!", "Debug", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
             int customerId = ((KeyValuePair<int, string>)comboBoxCustomer.SelectedItem).Key;
@@ -400,12 +395,7 @@ namespace SokProodos
             }
         }
 
-
-
-
-
-
-
+        // due date method, automata pairnei 7 meres meta apo thn shmerhni hmeromhnia , alla allazei analogos to shipping method
         private void SetDueDate(int customerId)
         {
             string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
@@ -471,9 +461,6 @@ namespace SokProodos
         }
 
 
-
-
-
         private void LoadProducts()
         {
             allProducts.Clear();
@@ -506,7 +493,7 @@ namespace SokProodos
 
         private void InitializeDataGridView()
         {
-            // Set the column headers
+            // COLUMN HEADERS
             dataGridViewInvoiceItems.Columns.Clear();
             dataGridViewInvoiceItems.Columns.Add("CustomerID", "Customer ID");
             dataGridViewInvoiceItems.Columns.Add("CustomerName", "Customer Name");
@@ -519,32 +506,32 @@ namespace SokProodos
             dataGridViewInvoiceItems.Columns.Add("ShippingMethod", "Shipping Method");
             dataGridViewInvoiceItems.Columns.Add("SpecialOffer", "Special Offer");
             dataGridViewInvoiceItems.Columns.Add("SpecialOfferID", "Special Offer ID");
-            dataGridViewInvoiceItems.Columns.Add("SellerName", "Seller Name"); // Add Seller Name column
+            dataGridViewInvoiceItems.Columns.Add("SellerName", "Seller Name"); 
 
-            // Set DataGridView properties to make it modern but clean
-            dataGridViewInvoiceItems.EnableHeadersVisualStyles = false; // Disable default header styles
-            dataGridViewInvoiceItems.ColumnHeadersDefaultCellStyle.BackColor = Color.White; // Set header to white
-            dataGridViewInvoiceItems.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black; // Black text color for header
-            dataGridViewInvoiceItems.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold); // Simple, modern font for header
+            
+            dataGridViewInvoiceItems.EnableHeadersVisualStyles = false; 
+            dataGridViewInvoiceItems.ColumnHeadersDefaultCellStyle.BackColor = Color.White; 
+            dataGridViewInvoiceItems.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black; 
+            dataGridViewInvoiceItems.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold); 
 
-            // Set the row styles
-            dataGridViewInvoiceItems.DefaultCellStyle.BackColor = Color.White; // Clean white background for rows
-            dataGridViewInvoiceItems.DefaultCellStyle.ForeColor = Color.Black; // Black text for clarity
-            dataGridViewInvoiceItems.DefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Regular); // Regular font for the content
+            // ROW STYLES
+            dataGridViewInvoiceItems.DefaultCellStyle.BackColor = Color.White; 
+            dataGridViewInvoiceItems.DefaultCellStyle.ForeColor = Color.Black; 
+            dataGridViewInvoiceItems.DefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Regular); 
 
-            // Set alternating row colors
-            dataGridViewInvoiceItems.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245); // Light gray for alternating rows
+            // XRWMATA
+            dataGridViewInvoiceItems.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245); 
 
-            // Set the gridline style to be less aggressive
-            dataGridViewInvoiceItems.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal; // Only horizontal borders for a clean look
-            dataGridViewInvoiceItems.GridColor = Color.FromArgb(200, 200, 200); // Light gray grid lines
+            
+            dataGridViewInvoiceItems.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal; 
+            dataGridViewInvoiceItems.GridColor = Color.FromArgb(200, 200, 200); 
 
-            // Allow scrolling and dynamic column sizing
-            dataGridViewInvoiceItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells; // Auto size columns to fit their content
-            dataGridViewInvoiceItems.AutoResizeColumns(); // Resizes columns as necessary
-            dataGridViewInvoiceItems.ScrollBars = ScrollBars.Both; // Enable both horizontal and vertical scrolling
+            
+            dataGridViewInvoiceItems.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells; 
+            dataGridViewInvoiceItems.AutoResizeColumns(); 
+            dataGridViewInvoiceItems.ScrollBars = ScrollBars.Both; 
 
-            // Optional: Add subtle row hover effect
+            
             dataGridViewInvoiceItems.CellMouseEnter += (s, e) =>
             {
                 if (e.RowIndex >= 0)
@@ -557,14 +544,14 @@ namespace SokProodos
             {
                 if (e.RowIndex >= 0)
                 {
-                    dataGridViewInvoiceItems.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.White; // Reset to default row color
+                    dataGridViewInvoiceItems.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.White; 
                 }
             };
 
-            // Set column widths dynamically or use specific widths based on the content
+            
             foreach (DataGridViewColumn column in dataGridViewInvoiceItems.Columns)
             {
-                column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells; // Automatically adjusts to fit content
+                column.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells; 
             }
         }
 
@@ -761,7 +748,7 @@ namespace SokProodos
             int productId = ((KeyValuePair<int, string>)comboBoxProduct.SelectedItem).Key;
             string productName = ((KeyValuePair<int, string>)comboBoxProduct.SelectedItem).Value;
 
-            // Get the selected seller's name
+            
             string sellerName = comboBoxSeller.SelectedItem != null ? ((KeyValuePair<int, string>)comboBoxSeller.SelectedItem).Value : "Not Selected";
 
             if (!int.TryParse(textBoxQuantity.Text, out int quantity) || quantity <= 0)
@@ -785,7 +772,7 @@ namespace SokProodos
             decimal discountedPrice = unitPrice * (1 - discountPct);
             decimal totalPrice = discountedPrice * quantity;
 
-            // Add row with seller name included
+            
             dataGridViewInvoiceItems.Rows.Add(
                 customerId,
                 customerName,
@@ -798,7 +785,7 @@ namespace SokProodos
                 comboBoxShipMethod.SelectedItem != null ? ((KeyValuePair<int, string>)comboBoxShipMethod.SelectedItem).Value : "Not Selected",
                 specialOffer,
                 specialOfferId,
-                sellerName // Add seller's name here
+                sellerName 
             );
 
             UpdateTotalOrderPrice();

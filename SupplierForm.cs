@@ -33,12 +33,12 @@ namespace SokProodos
 
         private void Button_MouseEnter(object sender, EventArgs e)
         {
-            ((Button)sender).BackColor = Color.FromArgb(114, 137, 218); // Lighter blue on hover
+            ((Button)sender).BackColor = Color.FromArgb(114, 137, 218); 
         }
 
         private void Button_MouseLeave(object sender, EventArgs e)
         {
-            ((Button)sender).BackColor = Color.FromArgb(88, 101, 242); // Normal state
+            ((Button)sender).BackColor = Color.FromArgb(88, 101, 242); 
         }
         private void buttonSaveSupplier_Click(object sender, EventArgs e)
         {

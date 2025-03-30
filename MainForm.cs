@@ -41,6 +41,9 @@ namespace SokProodos
             slideTimer.Interval = 10;
             slideTimer.Tick += SlidePanel_Tick;
             dataGridViewOpenOrders.CellClick += dataGridViewOpenOrders_CellClick;
+            dataGridViewOpenOrders.CellPainting += dataGridViewOpenOrders_CellPainting;
+
+
 
 
 
@@ -587,90 +590,98 @@ namespace SokProodos
                         DataTable dt = new DataTable();
                         adapter.Fill(dt);
 
-                        // Set DataSource
                         dataGridViewOpenOrders.DataSource = dt;
 
-                        // Clear previous button columns
+                        // Clear old buttons
                         if (dataGridViewOpenOrders.Columns.Contains("Approve"))
                             dataGridViewOpenOrders.Columns.Remove("Approve");
                         if (dataGridViewOpenOrders.Columns.Contains("Reject"))
                             dataGridViewOpenOrders.Columns.Remove("Reject");
 
-                        // Add Approve button
+                        // Add approve button
                         DataGridViewButtonColumn approveButton = new DataGridViewButtonColumn
                         {
                             Name = "Approve",
-                            HeaderText = "👍 Approve",
+                            HeaderText = "👍",
                             Text = "👍",
                             UseColumnTextForButtonValue = true,
                             FlatStyle = FlatStyle.Flat
                         };
                         dataGridViewOpenOrders.Columns.Add(approveButton);
 
-                        // Add Reject button
+                        // Add reject button
                         DataGridViewButtonColumn rejectButton = new DataGridViewButtonColumn
                         {
                             Name = "Reject",
-                            HeaderText = "👎 Reject",
+                            HeaderText = "👎",
                             Text = "👎",
                             UseColumnTextForButtonValue = true,
                             FlatStyle = FlatStyle.Flat
                         };
                         dataGridViewOpenOrders.Columns.Add(rejectButton);
 
-                        // Fit inside panelInfo
-                        dataGridViewOpenOrders.Parent = panelInfo;                      
-                        dataGridViewOpenOrders.BringToFront();
-
-                        // Appearance
-                        Color bgColor = Color.FromArgb(0, 122, 204); // panelInfo color
+                        // Style
+                        Color bgColor = Color.FromArgb(0, 122, 204);
 
                         dataGridViewOpenOrders.BackgroundColor = bgColor;
-                        dataGridViewOpenOrders.BorderStyle = BorderStyle.None;
-                        dataGridViewOpenOrders.GridColor = bgColor;
-                        dataGridViewOpenOrders.RowHeadersVisible = false;
+                        dataGridViewOpenOrders.BorderStyle = BorderStyle.FixedSingle;
+                        dataGridViewOpenOrders.GridColor = Color.White;
                         dataGridViewOpenOrders.EnableHeadersVisualStyles = false;
+                        dataGridViewOpenOrders.RowHeadersVisible = false;
 
-                        // Header styling
                         dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 160, 180);
                         dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
                         dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
-                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-                        // Cell styling
                         dataGridViewOpenOrders.DefaultCellStyle.BackColor = bgColor;
                         dataGridViewOpenOrders.DefaultCellStyle.ForeColor = Color.White;
-                        dataGridViewOpenOrders.DefaultCellStyle.Font = new Font("Segoe UI", 9);
                         dataGridViewOpenOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 160, 180);
                         dataGridViewOpenOrders.DefaultCellStyle.SelectionForeColor = Color.White;
                         dataGridViewOpenOrders.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-                        // Button styling
-                        foreach (DataGridViewColumn col in dataGridViewOpenOrders.Columns)
-                        {
-                            if (col is DataGridViewButtonColumn)
-                            {
-                                ((DataGridViewButtonColumn)col).FlatStyle = FlatStyle.Flat;
-                            }
-                        }
-
-                        // Size
                         dataGridViewOpenOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+
+                        // Ρύθμιση εμφάνισης μέσα στο panel
+                       
+                        dataGridViewOpenOrders.BringToFront();
+
+                        // Modern Flat Styling for the Grid
+                        dataGridViewOpenOrders.CellBorderStyle = DataGridViewCellBorderStyle.None;
+                        dataGridViewOpenOrders.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+                        dataGridViewOpenOrders.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+
+                        dataGridViewOpenOrders.GridColor = dataGridViewOpenOrders.BackgroundColor; // same color to hide lines
+
+                        // Smooth header padding & height
+                        dataGridViewOpenOrders.ColumnHeadersHeight = 36;
+                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.Padding = new Padding(0, 6, 0, 6);
+                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+                        // Rounded font, centered content
+                        dataGridViewOpenOrders.DefaultCellStyle.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
+                        dataGridViewOpenOrders.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+                        // Optional: Row height & padding
+                        dataGridViewOpenOrders.RowTemplate.Height = 30;
+                        dataGridViewOpenOrders.DefaultCellStyle.Padding = new Padding(0, 4, 0, 4);
+
+                        // Remove focus border around cells
+                        dataGridViewOpenOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 160, 180);
+                        dataGridViewOpenOrders.DefaultCellStyle.SelectionForeColor = Color.White;
+                        dataGridViewOpenOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 160, 180);
+                        dataGridViewOpenOrders.DefaultCellStyle.SelectionForeColor = Color.White;
+
+                        // Smooth scrolling
+                        dataGridViewOpenOrders.ScrollBars = ScrollBars.Vertical;
+
+
+                        
                     }
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error loading open orders: " + ex.Message);
-            }
-        }
-
-        private void RoundDataGridView(DataGridView dgv)
-        {
-            if (dgv.Width > 0 && dgv.Height > 0) // avoid zero-size issue on startup
-            {
-                GraphicsPath path = GraphicsExtensions.CreateRoundedRect(dgv.ClientRectangle, 12);
-                dgv.Region = new Region(path);
             }
         }
 
@@ -1081,6 +1092,37 @@ namespace SokProodos
             }
         }
 
+        private void dataGridViewOpenOrders_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (e.RowIndex < 0) return; // skip headers
+
+            string columnName = dataGridViewOpenOrders.Columns[e.ColumnIndex].Name;
+
+            if (columnName == "Approve" || columnName == "Reject")
+            {
+                e.PaintBackground(e.CellBounds, true);
+
+                Color bgColor = columnName == "Approve" ? Color.MediumSeaGreen : Color.IndianRed;
+                Color textColor = Color.White;
+                string buttonText = columnName == "Approve" ? "👍" : "👎";
+
+                using (Brush brush = new SolidBrush(bgColor))
+                {
+                    e.Graphics.FillRectangle(brush, e.CellBounds);
+                }
+
+                TextRenderer.DrawText(
+                    e.Graphics,
+                    buttonText,
+                    new Font("Segoe UI", 10, FontStyle.Bold),
+                    e.CellBounds,
+                    textColor,
+                    TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter
+                );
+
+                e.Handled = true;
+            }
+        }
 
 
         private void Button_MouseEnter(object sender, EventArgs e)

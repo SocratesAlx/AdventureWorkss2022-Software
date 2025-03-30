@@ -36,7 +36,28 @@ namespace SokProodos
             CreateRightActionButtons();
             this.StartPosition = FormStartPosition.CenterScreen;
             UIStyler.StyleButtonsInForm(this);
+            slideTimer = new Timer();
+            slideTimer.Interval = 10;
+            slideTimer.Tick += SlidePanel_Tick;
 
+
+            panelInfo.Visible = false;
+            panelInfo.BackColor = Color.FromArgb(0, 122, 204);
+            panelInfo.Padding = new Padding(10);
+            panelInfo.BorderStyle = BorderStyle.None;
+            int y = 10;
+            foreach (Control ctrl in panelInfo.Controls)
+            {
+                if (ctrl is Label lbl)
+                {
+                    lbl.ForeColor = Color.White;
+                    lbl.Font = new Font("Segoe UI", 9, FontStyle.Regular);
+                    lbl.Location = new Point(10, y);
+                    lbl.AutoSize = true;
+                    y += lbl.Height + 10;
+                }
+            }
+            
 
             Label labelCurrentUser = new Label
             {
@@ -98,6 +119,8 @@ namespace SokProodos
             labelAboutUs.MouseLeave += (s, e) => labelAboutUs.ForeColor = Color.LightBlue;
             labelAboutUs.BringToFront();
 
+            // info button starts clicked
+            this.Shown += (s, e) => buttonToggleInfo_Click(buttonToggleInfo, EventArgs.Empty);
 
         }
         private void LoadCurrentUser()
@@ -122,6 +145,8 @@ namespace SokProodos
             }
         }
 
+        private Timer slideTimer;
+        private bool slidingDown = true;
 
         private void LoadDashboardInfo()
         {
@@ -232,6 +257,40 @@ namespace SokProodos
             }
         }
 
+        private void SlidePanel_Tick(object sender, EventArgs e)
+        {
+            int targetHeight = slidingDown ? 130 : 0;
+            int step = 10;
+
+            if (slidingDown)
+            {
+                panelInfo.Height = Math.Min(panelInfo.Height + step, targetHeight);
+
+               
+                if (panelInfo.Height >= 30)
+                {
+                    using (GraphicsPath path = GraphicsExtensions.CreateRoundedRect(panelInfo.ClientRectangle, 12))
+                    {
+                        panelInfo.Region = new Region(path);
+                    }
+                }
+
+                if (panelInfo.Height >= targetHeight)
+                {
+                    slideTimer.Stop();
+                }
+            }
+            else
+            {
+                panelInfo.Height = Math.Max(panelInfo.Height - step, targetHeight);
+                if (panelInfo.Height <= 0)
+                {
+                    panelInfo.Visible = false;
+                    slideTimer.Stop();
+                }
+            }
+        }
+
 
 
         private void LabelReorderProducts_MouseEnter(object sender, EventArgs e)
@@ -253,10 +312,6 @@ namespace SokProodos
                 label.Font = new Font("Segoe UI", 10, FontStyle.Underline);
             }
         }
-
-
-
-
         private void CreateStyledSideMenu()
         {
             Panel sideMenu = new Panel
@@ -1017,6 +1072,24 @@ namespace SokProodos
             reorderForm.Show();
 
             this.Hide();
+        }
+
+        private void buttonToggleInfo_Click(object sender, EventArgs e)
+        {
+            if (!panelInfo.Visible)
+            {
+                panelInfo.Visible = true;
+                panelInfo.Height = 0; // reset height
+                slidingDown = true;
+                slideTimer.Start();
+                buttonToggleInfo.Text = "❌ Hide Info";
+            }
+            else
+            {
+                slidingDown = false;
+                slideTimer.Start();
+                buttonToggleInfo.Text = "ℹ️ Show Info";
+            }
         }
     }
     public static class ChartExtensions

@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.labelCurrentUser = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
             this.labelDateTime = new System.Windows.Forms.Label();
             this.labelTotalOrders = new System.Windows.Forms.Label();
             this.buttonLogOut = new System.Windows.Forms.Button();
@@ -38,33 +37,25 @@
             this.labelReorderProducts = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.panelInfo = new System.Windows.Forms.Panel();
+            this.buttonToggleInfo = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
+            this.panelInfo.SuspendLayout();
             this.SuspendLayout();
             // 
             // labelCurrentUser
             // 
             this.labelCurrentUser.AutoSize = true;
-            this.labelCurrentUser.BackColor = System.Drawing.Color.White;
+            this.labelCurrentUser.BackColor = System.Drawing.Color.Transparent;
             this.labelCurrentUser.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelCurrentUser.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.labelCurrentUser.Location = new System.Drawing.Point(207, 7);
+            this.labelCurrentUser.Location = new System.Drawing.Point(5, 13);
             this.labelCurrentUser.Name = "labelCurrentUser";
             this.labelCurrentUser.Size = new System.Drawing.Size(51, 20);
             this.labelCurrentUser.TabIndex = 20;
             this.labelCurrentUser.Text = "label1";
             this.labelCurrentUser.Click += new System.EventHandler(this.labelCurrentUser_Click);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.SystemColors.ButtonHighlight;
-            this.label1.Location = new System.Drawing.Point(199, 100);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(140, 18);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Insert and Update";
             // 
             // labelDateTime
             // 
@@ -80,7 +71,7 @@
             // 
             this.labelTotalOrders.AutoSize = true;
             this.labelTotalOrders.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTotalOrders.Location = new System.Drawing.Point(207, 43);
+            this.labelTotalOrders.Location = new System.Drawing.Point(5, 49);
             this.labelTotalOrders.Name = "labelTotalOrders";
             this.labelTotalOrders.Size = new System.Drawing.Size(51, 20);
             this.labelTotalOrders.TabIndex = 24;
@@ -110,7 +101,7 @@
             // 
             this.labelTotalOrderProfit.AutoSize = true;
             this.labelTotalOrderProfit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTotalOrderProfit.Location = new System.Drawing.Point(207, 80);
+            this.labelTotalOrderProfit.Location = new System.Drawing.Point(5, 86);
             this.labelTotalOrderProfit.Name = "labelTotalOrderProfit";
             this.labelTotalOrderProfit.Size = new System.Drawing.Size(51, 20);
             this.labelTotalOrderProfit.TabIndex = 27;
@@ -120,7 +111,7 @@
             // 
             this.labelReorderProducts.AutoSize = true;
             this.labelReorderProducts.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelReorderProducts.Location = new System.Drawing.Point(206, 111);
+            this.labelReorderProducts.Location = new System.Drawing.Point(4, 117);
             this.labelReorderProducts.Name = "labelReorderProducts";
             this.labelReorderProducts.Size = new System.Drawing.Size(215, 20);
             this.labelReorderProducts.TabIndex = 28;
@@ -130,7 +121,7 @@
             // pictureBox1
             // 
             this.pictureBox1.Image = global::SokProodos.Properties.Resources.awc_logo;
-            this.pictureBox1.Location = new System.Drawing.Point(469, 29);
+            this.pictureBox1.Location = new System.Drawing.Point(704, 693);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(516, 100);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -148,26 +139,46 @@
             this.pictureBox3.TabIndex = 22;
             this.pictureBox3.TabStop = false;
             // 
+            // panelInfo
+            // 
+            this.panelInfo.Controls.Add(this.labelCurrentUser);
+            this.panelInfo.Controls.Add(this.labelReorderProducts);
+            this.panelInfo.Controls.Add(this.labelTotalOrderProfit);
+            this.panelInfo.Controls.Add(this.labelTotalOrders);
+            this.panelInfo.Location = new System.Drawing.Point(202, 34);
+            this.panelInfo.Name = "panelInfo";
+            this.panelInfo.Size = new System.Drawing.Size(315, 141);
+            this.panelInfo.TabIndex = 29;
+            // 
+            // buttonToggleInfo
+            // 
+            this.buttonToggleInfo.Location = new System.Drawing.Point(202, 5);
+            this.buttonToggleInfo.Name = "buttonToggleInfo";
+            this.buttonToggleInfo.Size = new System.Drawing.Size(83, 28);
+            this.buttonToggleInfo.TabIndex = 30;
+            this.buttonToggleInfo.Text = "Info";
+            this.buttonToggleInfo.UseVisualStyleBackColor = true;
+            this.buttonToggleInfo.Click += new System.EventHandler(this.buttonToggleInfo_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ClientSize = new System.Drawing.Size(1269, 823);
-            this.Controls.Add(this.labelReorderProducts);
-            this.Controls.Add(this.labelTotalOrderProfit);
+            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.buttonToggleInfo);
+            this.Controls.Add(this.panelInfo);
             this.Controls.Add(this.labelAboutUs);
             this.Controls.Add(this.buttonLogOut);
-            this.Controls.Add(this.labelTotalOrders);
             this.Controls.Add(this.labelDateTime);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.labelCurrentUser);
             this.Controls.Add(this.pictureBox3);
             this.Name = "MainForm";
             this.Text = "MainForm";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
+            this.panelInfo.ResumeLayout(false);
+            this.panelInfo.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -175,7 +186,6 @@
 
         #endregion
         private System.Windows.Forms.Label labelCurrentUser;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBox3;
         private System.Windows.Forms.Label labelDateTime;
@@ -184,5 +194,7 @@
         private System.Windows.Forms.Label labelAboutUs;
         private System.Windows.Forms.Label labelTotalOrderProfit;
         private System.Windows.Forms.Label labelReorderProducts;
+        private System.Windows.Forms.Panel panelInfo;
+        private System.Windows.Forms.Button buttonToggleInfo;
     }
 }

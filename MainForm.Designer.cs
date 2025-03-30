@@ -39,9 +39,11 @@
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.panelInfo = new System.Windows.Forms.Panel();
             this.buttonToggleInfo = new System.Windows.Forms.Button();
+            this.dataGridViewOpenOrders = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.panelInfo.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOpenOrders)).BeginInit();
             this.SuspendLayout();
             // 
             // labelCurrentUser
@@ -141,24 +143,33 @@
             // 
             // panelInfo
             // 
+            this.panelInfo.Controls.Add(this.dataGridViewOpenOrders);
             this.panelInfo.Controls.Add(this.labelCurrentUser);
             this.panelInfo.Controls.Add(this.labelReorderProducts);
             this.panelInfo.Controls.Add(this.labelTotalOrderProfit);
             this.panelInfo.Controls.Add(this.labelTotalOrders);
-            this.panelInfo.Location = new System.Drawing.Point(202, 34);
+            this.panelInfo.Location = new System.Drawing.Point(215, 34);
             this.panelInfo.Name = "panelInfo";
-            this.panelInfo.Size = new System.Drawing.Size(315, 141);
+            this.panelInfo.Size = new System.Drawing.Size(875, 186);
             this.panelInfo.TabIndex = 29;
             // 
             // buttonToggleInfo
             // 
-            this.buttonToggleInfo.Location = new System.Drawing.Point(202, 5);
+            this.buttonToggleInfo.Location = new System.Drawing.Point(215, 0);
             this.buttonToggleInfo.Name = "buttonToggleInfo";
             this.buttonToggleInfo.Size = new System.Drawing.Size(83, 28);
             this.buttonToggleInfo.TabIndex = 30;
             this.buttonToggleInfo.Text = "Info";
             this.buttonToggleInfo.UseVisualStyleBackColor = true;
             this.buttonToggleInfo.Click += new System.EventHandler(this.buttonToggleInfo_Click);
+            // 
+            // dataGridViewOpenOrders
+            // 
+            this.dataGridViewOpenOrders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewOpenOrders.Location = new System.Drawing.Point(322, 13);
+            this.dataGridViewOpenOrders.Name = "dataGridViewOpenOrders";
+            this.dataGridViewOpenOrders.Size = new System.Drawing.Size(542, 150);
+            this.dataGridViewOpenOrders.TabIndex = 0;
             // 
             // MainForm
             // 
@@ -179,6 +190,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.panelInfo.ResumeLayout(false);
             this.panelInfo.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridViewOpenOrders)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -196,5 +208,6 @@
         private System.Windows.Forms.Label labelReorderProducts;
         private System.Windows.Forms.Panel panelInfo;
         private System.Windows.Forms.Button buttonToggleInfo;
+        private System.Windows.Forms.DataGridView dataGridViewOpenOrders;
     }
 }

@@ -34,11 +34,14 @@ namespace SokProodos
             LoadDashboardInfo();
             CreateStyledSideMenu();
             CreateRightActionButtons();
+            LoadOpenOrders(); // Show orders inside info panel immediately
             this.StartPosition = FormStartPosition.CenterScreen;
             UIStyler.StyleButtonsInForm(this);
             slideTimer = new Timer();
             slideTimer.Interval = 10;
             slideTimer.Tick += SlidePanel_Tick;
+            dataGridViewOpenOrders.CellClick += dataGridViewOpenOrders_CellClick;
+
 
 
             panelInfo.Visible = false;
@@ -57,7 +60,8 @@ namespace SokProodos
                     y += lbl.Height + 10;
                 }
             }
-            
+           
+
 
             Label labelCurrentUser = new Label
             {
@@ -121,6 +125,7 @@ namespace SokProodos
 
             // info button starts clicked
             this.Shown += (s, e) => buttonToggleInfo_Click(buttonToggleInfo, EventArgs.Empty);
+            
 
         }
         private void LoadCurrentUser()
@@ -259,7 +264,7 @@ namespace SokProodos
 
         private void SlidePanel_Tick(object sender, EventArgs e)
         {
-            int targetHeight = slidingDown ? 130 : 0;
+            int targetHeight = slidingDown ? 175 : 0;
             int step = 10;
 
             if (slidingDown)
@@ -563,6 +568,167 @@ namespace SokProodos
             panelDashboard.Controls.Add(chartTopProducts);
         }
 
+        private void LoadOpenOrders()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                SELECT SalesOrderID, 
+                       CONVERT(VARCHAR(10), OrderDate, 120) AS OrderDate, 
+                       CAST(TotalDue AS decimal(10,2)) AS TotalDue
+                FROM Sales.SalesOrderHeader
+                WHERE Status = 1"; // 1 = In Process
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
+                    {
+                        DataTable dt = new DataTable();
+                        adapter.Fill(dt);
+
+                        // Set DataSource
+                        dataGridViewOpenOrders.DataSource = dt;
+
+                        // Clear previous button columns
+                        if (dataGridViewOpenOrders.Columns.Contains("Approve"))
+                            dataGridViewOpenOrders.Columns.Remove("Approve");
+                        if (dataGridViewOpenOrders.Columns.Contains("Reject"))
+                            dataGridViewOpenOrders.Columns.Remove("Reject");
+
+                        // Add Approve button
+                        DataGridViewButtonColumn approveButton = new DataGridViewButtonColumn
+                        {
+                            Name = "Approve",
+                            HeaderText = "👍 Approve",
+                            Text = "👍",
+                            UseColumnTextForButtonValue = true,
+                            FlatStyle = FlatStyle.Flat
+                        };
+                        dataGridViewOpenOrders.Columns.Add(approveButton);
+
+                        // Add Reject button
+                        DataGridViewButtonColumn rejectButton = new DataGridViewButtonColumn
+                        {
+                            Name = "Reject",
+                            HeaderText = "👎 Reject",
+                            Text = "👎",
+                            UseColumnTextForButtonValue = true,
+                            FlatStyle = FlatStyle.Flat
+                        };
+                        dataGridViewOpenOrders.Columns.Add(rejectButton);
+
+                        // Fit inside panelInfo
+                        dataGridViewOpenOrders.Parent = panelInfo;                      
+                        dataGridViewOpenOrders.BringToFront();
+
+                        // Appearance
+                        Color bgColor = Color.FromArgb(0, 122, 204); // panelInfo color
+
+                        dataGridViewOpenOrders.BackgroundColor = bgColor;
+                        dataGridViewOpenOrders.BorderStyle = BorderStyle.None;
+                        dataGridViewOpenOrders.GridColor = bgColor;
+                        dataGridViewOpenOrders.RowHeadersVisible = false;
+                        dataGridViewOpenOrders.EnableHeadersVisualStyles = false;
+
+                        // Header styling
+                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 160, 180);
+                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
+                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+                        // Cell styling
+                        dataGridViewOpenOrders.DefaultCellStyle.BackColor = bgColor;
+                        dataGridViewOpenOrders.DefaultCellStyle.ForeColor = Color.White;
+                        dataGridViewOpenOrders.DefaultCellStyle.Font = new Font("Segoe UI", 9);
+                        dataGridViewOpenOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 160, 180);
+                        dataGridViewOpenOrders.DefaultCellStyle.SelectionForeColor = Color.White;
+                        dataGridViewOpenOrders.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+                        // Button styling
+                        foreach (DataGridViewColumn col in dataGridViewOpenOrders.Columns)
+                        {
+                            if (col is DataGridViewButtonColumn)
+                            {
+                                ((DataGridViewButtonColumn)col).FlatStyle = FlatStyle.Flat;
+                            }
+                        }
+
+                        // Size
+                        dataGridViewOpenOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading open orders: " + ex.Message);
+            }
+        }
+
+        private void RoundDataGridView(DataGridView dgv)
+        {
+            if (dgv.Width > 0 && dgv.Height > 0) // avoid zero-size issue on startup
+            {
+                GraphicsPath path = GraphicsExtensions.CreateRoundedRect(dgv.ClientRectangle, 12);
+                dgv.Region = new Region(path);
+            }
+        }
+
+
+        private void dataGridViewOpenOrders_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            {
+                string columnName = dataGridViewOpenOrders.Columns[e.ColumnIndex].Name;
+
+                // Get the SalesOrderID from the clicked row
+                string orderId = dataGridViewOpenOrders.Rows[e.RowIndex].Cells["SalesOrderID"].Value.ToString();
+
+                if (columnName == "Approve")
+                {
+                    DialogResult result = MessageBox.Show($"Approve order #{orderId}?", "Confirm Approval", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    if (result == DialogResult.Yes)
+                    {
+                        UpdateOrderStatus(orderId, 5); // 5 = Approved
+                    }
+                }
+                else if (columnName == "Reject")
+                {
+                    DialogResult result = MessageBox.Show($"Reject order #{orderId}?", "Confirm Rejection", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (result == DialogResult.Yes)
+                    {
+                        UpdateOrderStatus(orderId, 6); // 6 = Rejected
+                    }
+                }
+            }
+        }
+
+
+        private void UpdateOrderStatus(string orderId, int newStatus)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string updateQuery = "UPDATE Sales.SalesOrderHeader SET Status = @status WHERE SalesOrderID = @id";
+
+                    using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@status", newStatus);
+                        cmd.Parameters.AddWithValue("@id", orderId);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show("Order updated!");
+                    LoadOpenOrders();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error updating order: " + ex.Message);
+            }
+        }
 
 
         private void ComboBoxFilter_SelectedIndexChanged(object sender, EventArgs e)
@@ -1091,6 +1257,8 @@ namespace SokProodos
                 buttonToggleInfo.Text = "ℹ️ Show Info";
             }
         }
+
+     
     }
     public static class ChartExtensions
     {

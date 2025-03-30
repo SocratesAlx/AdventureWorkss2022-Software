@@ -125,14 +125,12 @@ namespace SokProodos
 
         private void LoadDashboardInfo()
         {
-            
             Label labelDateTime = this.Controls.Find("labelDateTime", true).FirstOrDefault() as Label;
             if (labelDateTime != null)
             {
                 labelDateTime.Text = "🕒 Date: " + DateTime.Now.ToString("dddd, dd MMM yyyy HH:mm");
             }
 
-            
             Label labelTotalOrders = this.Controls.Find("labelTotalOrders", true).FirstOrDefault() as Label;
             if (labelTotalOrders != null)
             {
@@ -155,7 +153,6 @@ namespace SokProodos
                 }
             }
 
-            // Profit apo finished goods flag, metraei to profit APO TO LISTING PRICE kai oxi to standard cost.
             Label labelTotalOrderProfit = this.Controls.Find("labelTotalOrderProfit", true).FirstOrDefault() as Label;
             if (labelTotalOrderProfit != null)
             {
@@ -165,16 +162,19 @@ namespace SokProodos
                     {
                         conn.Open();
                         string profitQuery = @"
-                    SELECT SUM((d.UnitPrice - p.StandardCost) * d.OrderQty)
-                    FROM Sales.SalesOrderDetail d
-                    JOIN Production.Product p ON d.ProductID = p.ProductID
-                    WHERE p.FinishedGoodsFlag = 1;";
+                SELECT SUM((d.UnitPrice - p.StandardCost) * d.OrderQty)
+                FROM Sales.SalesOrderDetail d
+                JOIN Production.Product p ON d.ProductID = p.ProductID
+                WHERE p.FinishedGoodsFlag = 1;";
 
                         using (SqlCommand cmd = new SqlCommand(profitQuery, conn))
                         {
                             object result = cmd.ExecuteScalar();
                             decimal totalProfit = result != DBNull.Value ? Convert.ToDecimal(result) : 0;
                             labelTotalOrderProfit.Text = "💰 Total Profit: " + totalProfit.ToString("C2");
+
+                            labelTotalOrderProfit.ForeColor = Color.FromArgb(0, 200, 0); // Green
+                            labelTotalOrderProfit.Font = new Font("Segoe UI", 10, FontStyle.Bold);
                         }
                     }
                 }
@@ -183,7 +183,77 @@ namespace SokProodos
                     labelTotalOrderProfit.Text = "❌ Error loading profit";
                 }
             }
+
+            Label labelReorderProducts = this.Controls.Find("labelReorderProducts", true).FirstOrDefault() as Label;
+            if (labelReorderProducts != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+                        string reorderQuery = @"
+                SELECT COUNT(*) 
+                FROM Production.Product p
+                JOIN Production.ProductInventory pi ON p.ProductID = pi.ProductID
+                WHERE p.MakeFlag = 0 AND pi.Quantity < p.ReorderPoint;";
+
+                        using (SqlCommand cmd = new SqlCommand(reorderQuery, conn))
+                        {
+                            int count = (int)cmd.ExecuteScalar();
+                            labelReorderProducts.Text = $"❗ You have {count} product(s) that need to be reordered";
+
+                            labelReorderProducts.ForeColor = Color.Red;
+                            labelReorderProducts.Font = new Font("Segoe UI", 10, FontStyle.Bold | FontStyle.Underline);
+                            labelReorderProducts.Cursor = Cursors.Hand;
+
+                            // Προσθέτουμε τα events για highlight
+                            labelReorderProducts.MouseEnter += (s, e) =>
+                            {
+                                labelReorderProducts.ForeColor = Color.OrangeRed;
+                            };
+                            labelReorderProducts.MouseLeave += (s, e) =>
+                            {
+                                labelReorderProducts.ForeColor = Color.Red;
+                            };
+                            labelReorderProducts.Click += (s, e) =>
+                            {
+                                ReorderProductsForm reorderForm = new ReorderProductsForm();
+                                reorderForm.Show();
+                                this.Hide();
+                            };
+                        }
+                    }
+                }
+                catch
+                {
+                    labelReorderProducts.Text = "❌ Error loading reorder info";
+                }
+            }
         }
+
+
+
+        private void LabelReorderProducts_MouseEnter(object sender, EventArgs e)
+        {
+            Label label = sender as Label;
+            if (label != null)
+            {
+                label.ForeColor = Color.OrangeRed;
+                label.Font = new Font("Segoe UI", 10, FontStyle.Bold | FontStyle.Underline);
+            }
+        }
+
+        private void LabelReorderProducts_MouseLeave(object sender, EventArgs e)
+        {
+            Label label = sender as Label;
+            if (label != null)
+            {
+                label.ForeColor = Color.Red;
+                label.Font = new Font("Segoe UI", 10, FontStyle.Underline);
+            }
+        }
+
 
 
 
@@ -937,6 +1007,14 @@ namespace SokProodos
         {
             Form1 Form1 = new Form1();
             Form1.Show();
+
+            this.Hide();
+        }
+
+        private void labelReorderProducts_Click(object sender, EventArgs e)
+        {
+            ReorderProductsForm reorderForm = new ReorderProductsForm();
+            reorderForm.Show();
 
             this.Hide();
         }

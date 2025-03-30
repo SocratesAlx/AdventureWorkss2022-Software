@@ -30,13 +30,14 @@
         {
             this.labelCurrentUser = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.labelDateTime = new System.Windows.Forms.Label();
             this.labelTotalOrders = new System.Windows.Forms.Label();
             this.buttonLogOut = new System.Windows.Forms.Button();
             this.labelAboutUs = new System.Windows.Forms.Label();
             this.labelTotalOrderProfit = new System.Windows.Forms.Label();
+            this.labelReorderProducts = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
@@ -64,27 +65,6 @@
             this.label1.Size = new System.Drawing.Size(140, 18);
             this.label1.TabIndex = 0;
             this.label1.Text = "Insert and Update";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::SokProodos.Properties.Resources.awc_logo;
-            this.pictureBox1.Location = new System.Drawing.Point(450, 29);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(516, 100);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox1.TabIndex = 21;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
-            // 
-            // pictureBox3
-            // 
-            this.pictureBox3.Image = global::SokProodos.Properties.Resources.pngwing_com__17_;
-            this.pictureBox3.Location = new System.Drawing.Point(293, 688);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(1095, 235);
-            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox3.TabIndex = 22;
-            this.pictureBox3.TabStop = false;
             // 
             // labelDateTime
             // 
@@ -136,12 +116,45 @@
             this.labelTotalOrderProfit.TabIndex = 27;
             this.labelTotalOrderProfit.Text = "label2";
             // 
+            // labelReorderProducts
+            // 
+            this.labelReorderProducts.AutoSize = true;
+            this.labelReorderProducts.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelReorderProducts.Location = new System.Drawing.Point(206, 111);
+            this.labelReorderProducts.Name = "labelReorderProducts";
+            this.labelReorderProducts.Size = new System.Drawing.Size(215, 20);
+            this.labelReorderProducts.TabIndex = 28;
+            this.labelReorderProducts.Text = "📦 Reorder Status: Loading...";
+            this.labelReorderProducts.Click += new System.EventHandler(this.labelReorderProducts_Click);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::SokProodos.Properties.Resources.awc_logo;
+            this.pictureBox1.Location = new System.Drawing.Point(469, 29);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(516, 100);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox1.TabIndex = 21;
+            this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
+            // 
+            // pictureBox3
+            // 
+            this.pictureBox3.Image = global::SokProodos.Properties.Resources.pngwing_com__17_;
+            this.pictureBox3.Location = new System.Drawing.Point(293, 688);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(1095, 235);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox3.TabIndex = 22;
+            this.pictureBox3.TabStop = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ClientSize = new System.Drawing.Size(1269, 823);
+            this.Controls.Add(this.labelReorderProducts);
             this.Controls.Add(this.labelTotalOrderProfit);
             this.Controls.Add(this.labelAboutUs);
             this.Controls.Add(this.buttonLogOut);
@@ -170,5 +183,6 @@
         private System.Windows.Forms.Button buttonLogOut;
         private System.Windows.Forms.Label labelAboutUs;
         private System.Windows.Forms.Label labelTotalOrderProfit;
+        private System.Windows.Forms.Label labelReorderProducts;
     }
 }

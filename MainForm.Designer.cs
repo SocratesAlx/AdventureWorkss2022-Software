@@ -36,6 +36,7 @@
             this.labelTotalOrders = new System.Windows.Forms.Label();
             this.buttonLogOut = new System.Windows.Forms.Button();
             this.labelAboutUs = new System.Windows.Forms.Label();
+            this.labelTotalOrderProfit = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.SuspendLayout();
@@ -125,12 +126,23 @@
             this.labelAboutUs.TabIndex = 26;
             this.labelAboutUs.Text = "label2";
             // 
+            // labelTotalOrderProfit
+            // 
+            this.labelTotalOrderProfit.AutoSize = true;
+            this.labelTotalOrderProfit.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelTotalOrderProfit.Location = new System.Drawing.Point(207, 80);
+            this.labelTotalOrderProfit.Name = "labelTotalOrderProfit";
+            this.labelTotalOrderProfit.Size = new System.Drawing.Size(51, 20);
+            this.labelTotalOrderProfit.TabIndex = 27;
+            this.labelTotalOrderProfit.Text = "label2";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ClientSize = new System.Drawing.Size(1269, 823);
+            this.Controls.Add(this.labelTotalOrderProfit);
             this.Controls.Add(this.labelAboutUs);
             this.Controls.Add(this.buttonLogOut);
             this.Controls.Add(this.labelTotalOrders);
@@ -157,5 +169,6 @@
         private System.Windows.Forms.Label labelTotalOrders;
         private System.Windows.Forms.Button buttonLogOut;
         private System.Windows.Forms.Label labelAboutUs;
+        private System.Windows.Forms.Label labelTotalOrderProfit;
     }
 }

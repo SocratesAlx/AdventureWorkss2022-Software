@@ -132,7 +132,7 @@ namespace SokProodos
                 labelDateTime.Text = "🕒 Date: " + DateTime.Now.ToString("dddd, dd MMM yyyy HH:mm");
             }
 
-            // total orders me bash to ID, den ksexorizei sales orders kai buy orders
+            
             Label labelTotalOrders = this.Controls.Find("labelTotalOrders", true).FirstOrDefault() as Label;
             if (labelTotalOrders != null)
             {
@@ -149,12 +149,43 @@ namespace SokProodos
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                     labelTotalOrders.Text = "❌ Error loading orders";
                 }
             }
+
+            // Profit apo finished goods flag, metraei to profit APO TO LISTING PRICE kai oxi to standard cost.
+            Label labelTotalOrderProfit = this.Controls.Find("labelTotalOrderProfit", true).FirstOrDefault() as Label;
+            if (labelTotalOrderProfit != null)
+            {
+                try
+                {
+                    using (SqlConnection conn = new SqlConnection(connectionString))
+                    {
+                        conn.Open();
+                        string profitQuery = @"
+                    SELECT SUM((d.UnitPrice - p.StandardCost) * d.OrderQty)
+                    FROM Sales.SalesOrderDetail d
+                    JOIN Production.Product p ON d.ProductID = p.ProductID
+                    WHERE p.FinishedGoodsFlag = 1;";
+
+                        using (SqlCommand cmd = new SqlCommand(profitQuery, conn))
+                        {
+                            object result = cmd.ExecuteScalar();
+                            decimal totalProfit = result != DBNull.Value ? Convert.ToDecimal(result) : 0;
+                            labelTotalOrderProfit.Text = "💰 Total Profit: " + totalProfit.ToString("C2");
+                        }
+                    }
+                }
+                catch
+                {
+                    labelTotalOrderProfit.Text = "❌ Error loading profit";
+                }
+            }
         }
+
+
 
         private void CreateStyledSideMenu()
         {

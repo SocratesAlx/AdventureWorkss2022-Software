@@ -25,6 +25,7 @@ namespace SokProodos
             UIStyler.StyleButtonsInForm(this);
 
 
+
             comboBoxYear.SelectedIndexChanged += new EventHandler(FilterOrders);
             comboBoxMonth.SelectedIndexChanged += new EventHandler(FilterOrders);
             comboBoxCustomer.SelectedIndexChanged += new EventHandler(FilterOrders);
@@ -177,44 +178,50 @@ namespace SokProodos
                     connection.Open();
 
                     string query = @"
-                        SELECT 
-    soh.SalesOrderID AS 'Order ID',
-    soh.OrderDate AS 'Order Date',
-    soh.DueDate AS 'Due Date',
-    c.CustomerID AS 'Customer ID',
-    ISNULL(p.FirstName + ' ' + p.LastName, s.Name) AS 'Customer Name',
-    sp.BusinessEntityID AS 'Seller ID',
-    per.FirstName + ' ' + per.LastName AS 'Seller Name',
-    soh.TotalDue AS 'Total Amount',
-    sm.Name AS 'Shipping Method',
-    soh.BillToAddressID AS 'Billing Address ID',
-    a.AddressLine1 + ', ' + a.City AS 'Billing Address',
-    sod.SpecialOfferID AS 'Special Offer ID',
-    so.Description AS 'Special Offer',
-    sod.OrderQty AS 'Order Quantity',
-    sod.UnitPrice AS 'Unit Price',
-    (sod.UnitPrice * sod.OrderQty) AS 'Total Price',
-    sod.ProductID AS 'Product ID',
-    pr.Name AS 'Product Name'
-FROM Sales.SalesOrderHeader soh
-JOIN Sales.Customer c ON soh.CustomerID = c.CustomerID
-LEFT JOIN Person.Person p ON c.PersonID = p.BusinessEntityID
-LEFT JOIN Sales.Store s ON c.StoreID = s.BusinessEntityID
-LEFT JOIN Sales.SalesPerson sp ON soh.SalesPersonID = sp.BusinessEntityID
-LEFT JOIN Person.Person per ON sp.BusinessEntityID = per.BusinessEntityID
-LEFT JOIN Sales.SalesOrderDetail sod ON soh.SalesOrderID = sod.SalesOrderID
-LEFT JOIN Sales.SpecialOffer so ON sod.SpecialOfferID = so.SpecialOfferID
-LEFT JOIN Purchasing.ShipMethod sm ON soh.ShipMethodID = sm.ShipMethodID
-LEFT JOIN Person.Address a ON soh.BillToAddressID = a.AddressID
-LEFT JOIN Production.Product pr ON sod.ProductID = pr.ProductID
-ORDER BY soh.OrderDate DESC;
- ";
+                SELECT 
+                    soh.SalesOrderID AS 'Order ID',
+                    soh.OrderDate AS 'Order Date',
+                    soh.DueDate AS 'Due Date',
+                    c.CustomerID AS 'Customer ID',
+                    ISNULL(p.FirstName + ' ' + p.LastName, s.Name) AS 'Customer Name',
+                    sp.BusinessEntityID AS 'Seller ID',
+                    per.FirstName + ' ' + per.LastName AS 'Seller Name',
+                    soh.TotalDue AS 'Total Amount',
+                    sm.Name AS 'Shipping Method',
+                    soh.BillToAddressID AS 'Billing Address ID',
+                    a.AddressLine1 + ', ' + a.City AS 'Billing Address',
+                    sod.SpecialOfferID AS 'Special Offer ID',
+                    so.Description AS 'Special Offer',
+                    sod.OrderQty AS 'Order Quantity',
+                    sod.UnitPrice AS 'Unit Price',
+                    (sod.UnitPrice * sod.OrderQty) AS 'Total Price',
+                    sod.ProductID AS 'Product ID',
+                    pr.Name AS 'Product Name',
+                    CASE 
+                        WHEN oa.Approved = 1 THEN 'Approved'
+                        WHEN oa.Approved = 0 THEN 'Rejected'
+                        ELSE 'Pending'
+                    END AS 'Approval Status'
+                FROM Sales.SalesOrderHeader soh
+                JOIN Sales.Customer c ON soh.CustomerID = c.CustomerID
+                LEFT JOIN Person.Person p ON c.PersonID = p.BusinessEntityID
+                LEFT JOIN Sales.Store s ON c.StoreID = s.BusinessEntityID
+                LEFT JOIN Sales.SalesPerson sp ON soh.SalesPersonID = sp.BusinessEntityID
+                LEFT JOIN Person.Person per ON sp.BusinessEntityID = per.BusinessEntityID
+                LEFT JOIN Sales.SalesOrderDetail sod ON soh.SalesOrderID = sod.SalesOrderID
+                LEFT JOIN Sales.SpecialOffer so ON sod.SpecialOfferID = so.SpecialOfferID
+                LEFT JOIN Purchasing.ShipMethod sm ON soh.ShipMethodID = sm.ShipMethodID
+                LEFT JOIN Person.Address a ON soh.BillToAddressID = a.AddressID
+                LEFT JOIN Production.Product pr ON sod.ProductID = pr.ProductID
+                LEFT JOIN OrderApprovals oa ON soh.SalesOrderID = oa.SalesOrderID
+                ORDER BY soh.OrderDate DESC;";
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(query, connection))
                     {
                         DataTable dataTable = new DataTable();
                         adapter.Fill(dataTable);
                         dataGridViewOrderHistory.DataSource = dataTable;
+                        ApplyApprovalStatusColors(); // Χρωματισμός των γραμμών
                     }
                 }
                 catch (Exception ex)
@@ -223,6 +230,8 @@ ORDER BY soh.OrderDate DESC;
                 }
             }
         }
+
+
 
         private void FilterOrders(object sender, EventArgs e)
         {
@@ -256,7 +265,8 @@ ORDER BY soh.OrderDate DESC;
                     sod.UnitPrice AS 'Unit Price',
                     (sod.UnitPrice * sod.OrderQty) AS 'Total Price',
                     sod.ProductID AS 'Product ID',
-                    pr.Name AS 'Product Name'
+                    pr.Name AS 'Product Name',
+                    oa.Approved AS 'Approval Status'
                 FROM Sales.SalesOrderHeader soh
                 JOIN Sales.Customer c ON soh.CustomerID = c.CustomerID
                 LEFT JOIN Person.Person p ON c.PersonID = p.BusinessEntityID
@@ -268,6 +278,7 @@ ORDER BY soh.OrderDate DESC;
                 LEFT JOIN Purchasing.ShipMethod sm ON soh.ShipMethodID = sm.ShipMethodID
                 LEFT JOIN Person.Address a ON soh.BillToAddressID = a.AddressID
                 LEFT JOIN Production.Product pr ON sod.ProductID = pr.ProductID
+                LEFT JOIN OrderApprovals oa ON soh.SalesOrderID = oa.SalesOrderID
                 WHERE 1=1";
 
                     List<SqlParameter> parameters = new List<SqlParameter>();
@@ -310,6 +321,7 @@ ORDER BY soh.OrderDate DESC;
                             DataTable dt = new DataTable();
                             adapter.Fill(dt);
                             dataGridViewOrderHistory.DataSource = dt;
+                            ApplyApprovalStatusColors(); // ➕ προσθήκη εδώ
                         }
                     }
                 }
@@ -320,6 +332,31 @@ ORDER BY soh.OrderDate DESC;
             }
         }
 
+
+        private void ApplyApprovalStatusColors()
+        {
+            foreach (DataGridViewRow row in dataGridViewOrderHistory.Rows)
+            {
+                if (row.Cells["Approval Status"].Value != null)
+                {
+                    string status = row.Cells["Approval Status"].Value.ToString().Trim().ToLower();
+
+                    switch (status)
+                    {
+                        case "approved":
+                            row.DefaultCellStyle.BackColor = Color.LightGreen;
+                            break;
+                        case "rejected":
+                            row.DefaultCellStyle.BackColor = Color.LightCoral;
+                            break;
+                        case "pending":
+                        default:
+                            row.DefaultCellStyle.BackColor = Color.LightGray;
+                            break;
+                    }
+                }
+            }
+        }
 
 
 

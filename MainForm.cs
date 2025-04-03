@@ -722,16 +722,32 @@ namespace SokProodos
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string updateQuery = "UPDATE Sales.SalesOrderHeader SET Status = @status WHERE SalesOrderID = @id";
 
-                    using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
+                    // Update Sales.SalesOrderHeader (status field)
+                    string updateHeader = "UPDATE Sales.SalesOrderHeader SET Status = @status WHERE SalesOrderID = @id";
+                    using (SqlCommand cmd = new SqlCommand(updateHeader, conn))
                     {
                         cmd.Parameters.AddWithValue("@status", newStatus);
                         cmd.Parameters.AddWithValue("@id", orderId);
                         cmd.ExecuteNonQuery();
                     }
 
-                    MessageBox.Show("Order updated!");
+                    // Update or Insert into OrderApprovals
+                    string upsertApproval = @"
+                IF EXISTS (SELECT 1 FROM OrderApprovals WHERE SalesOrderID = @id)
+                    UPDATE OrderApprovals SET Approved = @approved WHERE SalesOrderID = @id;
+                ELSE
+                    INSERT INTO OrderApprovals (SalesOrderID, Approved) VALUES (@id, @approved);";
+
+                    using (SqlCommand cmd = new SqlCommand(upsertApproval, conn))
+                    {
+                        bool? approvedValue = newStatus == 5 ? true : newStatus == 6 ? (bool?)false : null;
+                        cmd.Parameters.AddWithValue("@id", orderId);
+                        cmd.Parameters.AddWithValue("@approved", approvedValue.HasValue ? (object)approvedValue : DBNull.Value);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show("Order updated successfully!");
                     LoadOpenOrders();
                 }
             }
@@ -740,6 +756,8 @@ namespace SokProodos
                 MessageBox.Show("Error updating order: " + ex.Message);
             }
         }
+
+
 
 
         private void ComboBoxFilter_SelectedIndexChanged(object sender, EventArgs e)

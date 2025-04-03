@@ -42,6 +42,8 @@ namespace SokProodos
             CreateStyledOrderFormButtons();
             UIStyler.StyleButtonsInForm(this);
             this.StartPosition = FormStartPosition.CenterScreen;
+            comboBoxProduct.SelectedIndexChanged += ProductOrQuantity_Changed;
+            textBoxQuantity.TextChanged += ProductOrQuantity_Changed;
             comboBoxCustomer.DropDownStyle = ComboBoxStyle.DropDown;
             comboBoxCustomer.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             comboBoxCustomer.AutoCompleteSource = AutoCompleteSource.ListItems;
@@ -144,6 +146,59 @@ namespace SokProodos
                 }
             }
         }
+
+        private void ProductOrQuantity_Changed(object sender, EventArgs e)
+        {
+            if (comboBoxProduct.SelectedItem is KeyValuePair<int, string> selectedProduct &&
+                int.TryParse(textBoxQuantity.Text, out int quantity) && quantity > 0)
+            {
+                int productId = selectedProduct.Key;
+
+                // Βρες ειδική προσφορά
+                int specialOfferId = GetValidSpecialOfferId(productId);
+                decimal discountPct = GetDiscountPercent(specialOfferId);
+
+                // Τιμή μονάδας
+                decimal unitPrice = GetProductPrice(productId);
+                decimal discountedPrice = unitPrice * (1 - discountPct);
+                decimal totalPrice = discountedPrice * quantity;
+
+                // Ενημέρωση πεδίων
+                textBoxTotalPrice.Text = totalPrice.ToString("F2");
+
+                // Βρες περιγραφή προσφοράς (ή δείξε "No Discount")
+                string offerDescription = GetSpecialOfferDescription(specialOfferId);
+                comboBoxSpecialOffer.Items.Clear();
+                comboBoxSpecialOffer.Items.Add(new KeyValuePair<int, string>(specialOfferId, offerDescription));
+                comboBoxSpecialOffer.SelectedIndex = 0;
+            }
+            else
+            {
+                textBoxTotalPrice.Text = "0.00";
+                comboBoxSpecialOffer.Items.Clear();
+            }
+        }
+
+        private string GetSpecialOfferDescription(int specialOfferId)
+        {
+            if (specialOfferId <= 1) return "No Discount";
+
+            string description = "Offer " + specialOfferId;
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+                string query = "SELECT Description FROM Sales.SpecialOffer WHERE SpecialOfferID = @ID";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    cmd.Parameters.AddWithValue("@ID", specialOfferId);
+                    object result = cmd.ExecuteScalar();
+                    if (result != null && result != DBNull.Value)
+                        description = result.ToString();
+                }
+            }
+            return description;
+        }
+
 
 
         private void LoadCustomerBillingAddress(int customerId)
@@ -471,7 +526,13 @@ namespace SokProodos
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                string query = "SELECT ProductID, Name FROM Production.Product WHERE FinishedGoodsFlag = 1";
+
+                string query = @"
+            SELECT DISTINCT p.ProductID, p.Name
+            FROM Production.Product p
+            JOIN Production.ProductInventory pi ON p.ProductID = pi.ProductID
+            WHERE p.FinishedGoodsFlag = 1
+              AND pi.Quantity > 0";
 
                 using (SqlCommand command = new SqlCommand(query, connection))
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -490,6 +551,7 @@ namespace SokProodos
             comboBoxProduct.ValueMember = "Key";
             comboBoxProduct.SelectedIndex = -1;
         }
+
 
         private void InitializeDataGridView()
         {

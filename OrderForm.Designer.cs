@@ -191,7 +191,7 @@
             // 
             this.labelQuantity.AutoSize = true;
             this.labelQuantity.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelQuantity.Location = new System.Drawing.Point(14, 277);
+            this.labelQuantity.Location = new System.Drawing.Point(14, 273);
             this.labelQuantity.Name = "labelQuantity";
             this.labelQuantity.Size = new System.Drawing.Size(68, 20);
             this.labelQuantity.TabIndex = 14;
@@ -199,7 +199,7 @@
             // 
             // textBoxQuantity
             // 
-            this.textBoxQuantity.Location = new System.Drawing.Point(126, 276);
+            this.textBoxQuantity.Location = new System.Drawing.Point(126, 273);
             this.textBoxQuantity.Name = "textBoxQuantity";
             this.textBoxQuantity.Size = new System.Drawing.Size(121, 21);
             this.textBoxQuantity.TabIndex = 15;
@@ -216,7 +216,7 @@
             // 
             this.labelSpecialOffer.AutoSize = true;
             this.labelSpecialOffer.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelSpecialOffer.Location = new System.Drawing.Point(14, 318);
+            this.labelSpecialOffer.Location = new System.Drawing.Point(14, 307);
             this.labelSpecialOffer.Name = "labelSpecialOffer";
             this.labelSpecialOffer.Size = new System.Drawing.Size(101, 20);
             this.labelSpecialOffer.TabIndex = 17;
@@ -225,7 +225,7 @@
             // comboBoxSpecialOffer
             // 
             this.comboBoxSpecialOffer.FormattingEnabled = true;
-            this.comboBoxSpecialOffer.Location = new System.Drawing.Point(126, 315);
+            this.comboBoxSpecialOffer.Location = new System.Drawing.Point(126, 309);
             this.comboBoxSpecialOffer.Name = "comboBoxSpecialOffer";
             this.comboBoxSpecialOffer.Size = new System.Drawing.Size(121, 23);
             this.comboBoxSpecialOffer.TabIndex = 18;
@@ -234,7 +234,7 @@
             // 
             this.labelTotalPrice.AutoSize = true;
             this.labelTotalPrice.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelTotalPrice.Location = new System.Drawing.Point(14, 357);
+            this.labelTotalPrice.Location = new System.Drawing.Point(14, 342);
             this.labelTotalPrice.Name = "labelTotalPrice";
             this.labelTotalPrice.Size = new System.Drawing.Size(83, 20);
             this.labelTotalPrice.TabIndex = 19;
@@ -242,7 +242,7 @@
             // 
             // textBoxTotalPrice
             // 
-            this.textBoxTotalPrice.Location = new System.Drawing.Point(126, 357);
+            this.textBoxTotalPrice.Location = new System.Drawing.Point(126, 344);
             this.textBoxTotalPrice.Name = "textBoxTotalPrice";
             this.textBoxTotalPrice.Size = new System.Drawing.Size(121, 21);
             this.textBoxTotalPrice.TabIndex = 20;
@@ -275,18 +275,18 @@
             // groupBox1
             // 
             this.groupBox1.BackColor = System.Drawing.Color.White;
+            this.groupBox1.Controls.Add(this.textBoxTotalPrice);
+            this.groupBox1.Controls.Add(this.labelTotalPrice);
+            this.groupBox1.Controls.Add(this.labelSpecialOffer);
             this.groupBox1.Controls.Add(this.comboBoxCustomer);
+            this.groupBox1.Controls.Add(this.comboBoxSpecialOffer);
             this.groupBox1.Controls.Add(this.labelCustomer);
             this.groupBox1.Controls.Add(this.labelBillingAddress);
             this.groupBox1.Controls.Add(this.textBoxBillingAddress);
             this.groupBox1.Controls.Add(this.labelOrderDate);
-            this.groupBox1.Controls.Add(this.textBoxTotalPrice);
             this.groupBox1.Controls.Add(this.textBoxOrderDate);
-            this.groupBox1.Controls.Add(this.labelTotalPrice);
             this.groupBox1.Controls.Add(this.labelDueDate);
-            this.groupBox1.Controls.Add(this.comboBoxSpecialOffer);
             this.groupBox1.Controls.Add(this.textBoxDueDate);
-            this.groupBox1.Controls.Add(this.labelSpecialOffer);
             this.groupBox1.Controls.Add(this.labelSeller);
             this.groupBox1.Controls.Add(this.comboBoxSeller);
             this.groupBox1.Controls.Add(this.textBoxQuantity);
@@ -306,9 +306,9 @@
             // pictureBox2
             // 
             this.pictureBox2.Image = global::SokProodos.Properties.Resources.pngwing_com__18_;
-            this.pictureBox2.Location = new System.Drawing.Point(-54, 12);
+            this.pictureBox2.Location = new System.Drawing.Point(-4, -53);
             this.pictureBox2.Name = "pictureBox2";
-            this.pictureBox2.Size = new System.Drawing.Size(1090, 603);
+            this.pictureBox2.Size = new System.Drawing.Size(1027, 603);
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox2.TabIndex = 27;
             this.pictureBox2.TabStop = false;

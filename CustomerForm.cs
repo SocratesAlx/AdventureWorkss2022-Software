@@ -158,7 +158,7 @@ namespace SokProodos
                         cmd.ExecuteNonQuery();
                     }
 
-                    // Email insert (αν υπάρχει)
+                    
                     if (!string.IsNullOrWhiteSpace(email))
                     {
                         string emailQuery = @"
@@ -173,7 +173,7 @@ namespace SokProodos
                         }
                     }
 
-                    // Phone insert (αν υπάρχει)
+                    
                     if (!string.IsNullOrWhiteSpace(phone))
                     {
                         string phoneQuery = @"
@@ -202,11 +202,6 @@ namespace SokProodos
 
 
 
-
-
-
-
-
         private void ResetForm()
         {
             textBoxFirstName.Clear();
@@ -215,8 +210,8 @@ namespace SokProodos
             textBoxBillingAddress.Clear();
             textBoxCity.Clear();
             textBoxPostalCode.Clear();
-            comboBoxState.SelectedIndex = -1; // Reset state selection
-            textBoxFirstName.Focus(); // Move cursor back to first input field
+            comboBoxState.SelectedIndex = -1; 
+            textBoxFirstName.Focus(); 
         }
 
 
@@ -381,7 +376,7 @@ namespace SokProodos
                         }
                     }
 
-                    // Step 2: Update Address
+                    
                     if (addressId > 0)
                     {
                         string updateAddressQuery = @"
@@ -400,7 +395,7 @@ namespace SokProodos
                         }
                     }
 
-                    // Step 3: Update Customer Name
+                    
                     string updateCustomerQuery = @"
                 UPDATE Person.Person
                 SET FirstName = @FirstName, LastName = @LastName
@@ -414,7 +409,7 @@ namespace SokProodos
                         cmd.ExecuteNonQuery();
                     }
 
-                    // Step 4: Update or Insert Email
+                    
                     string emailQuery = @"
                 IF EXISTS (SELECT 1 FROM Person.EmailAddress WHERE BusinessEntityID = @BusinessEntityID)
                     UPDATE Person.EmailAddress 
@@ -431,7 +426,7 @@ namespace SokProodos
                         cmd.ExecuteNonQuery();
                     }
 
-                    // Step 5: Update or Insert Phone Number
+                    
                     string phoneQuery = @"
                 IF EXISTS (SELECT 1 FROM Person.PersonPhone WHERE BusinessEntityID = @BusinessEntityID)
                     UPDATE Person.PersonPhone 

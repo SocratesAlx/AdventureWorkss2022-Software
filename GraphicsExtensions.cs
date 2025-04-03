@@ -16,18 +16,18 @@ namespace SokProodos
             int diameter = radius * 2;
             Rectangle arc = new Rectangle(bounds.Location, new Size(diameter, diameter));
 
-            // Top-left arc
+            
             path.AddArc(arc, 180, 90);
 
-            // Top-right arc
+            
             arc.X = bounds.Right - diameter;
             path.AddArc(arc, 270, 90);
 
-            // Bottom-right arc
+            
             arc.Y = bounds.Bottom - diameter;
             path.AddArc(arc, 0, 90);
 
-            // Bottom-left arc
+            
             arc.X = bounds.Left;
             path.AddArc(arc, 90, 90);
 

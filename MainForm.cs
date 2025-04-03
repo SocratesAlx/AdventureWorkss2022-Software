@@ -34,7 +34,7 @@ namespace SokProodos
             LoadDashboardInfo();
             CreateStyledSideMenu();
             CreateRightActionButtons();
-            LoadOpenOrders(); // Show orders inside info panel immediately
+            LoadOpenOrders(); // Anoigeis ta orders kateutheian
             this.StartPosition = FormStartPosition.CenterScreen;
             UIStyler.StyleButtonsInForm(this);
             slideTimer = new Timer();
@@ -583,7 +583,7 @@ namespace SokProodos
                        CONVERT(VARCHAR(10), OrderDate, 120) AS OrderDate, 
                        CAST(TotalDue AS decimal(10,2)) AS TotalDue
                 FROM Sales.SalesOrderHeader
-                WHERE Status = 1"; // 1 = In Process
+                WHERE Status = 1"; // 1 = se process
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
                     {
@@ -592,13 +592,13 @@ namespace SokProodos
 
                         dataGridViewOpenOrders.DataSource = dt;
 
-                        // Clear old buttons
+                        
                         if (dataGridViewOpenOrders.Columns.Contains("Approve"))
                             dataGridViewOpenOrders.Columns.Remove("Approve");
                         if (dataGridViewOpenOrders.Columns.Contains("Reject"))
                             dataGridViewOpenOrders.Columns.Remove("Reject");
 
-                        // Add approve button
+                        
                         DataGridViewButtonColumn approveButton = new DataGridViewButtonColumn
                         {
                             Name = "Approve",
@@ -609,7 +609,7 @@ namespace SokProodos
                         };
                         dataGridViewOpenOrders.Columns.Add(approveButton);
 
-                        // Add reject button
+                        
                         DataGridViewButtonColumn rejectButton = new DataGridViewButtonColumn
                         {
                             Name = "Reject",
@@ -641,37 +641,37 @@ namespace SokProodos
 
                         dataGridViewOpenOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
 
-                        // Ρύθμιση εμφάνισης μέσα στο panel
+                        
                        
                         dataGridViewOpenOrders.BringToFront();
 
-                        // Modern Flat Styling for the Grid
+                        
                         dataGridViewOpenOrders.CellBorderStyle = DataGridViewCellBorderStyle.None;
                         dataGridViewOpenOrders.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
                         dataGridViewOpenOrders.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
 
                         dataGridViewOpenOrders.GridColor = dataGridViewOpenOrders.BackgroundColor; // same color to hide lines
 
-                        // Smooth header padding & height
+                        
                         dataGridViewOpenOrders.ColumnHeadersHeight = 36;
                         dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.Padding = new Padding(0, 6, 0, 6);
                         dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-                        // Rounded font, centered content
+                       
                         dataGridViewOpenOrders.DefaultCellStyle.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
                         dataGridViewOpenOrders.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-                        // Optional: Row height & padding
+                        
                         dataGridViewOpenOrders.RowTemplate.Height = 30;
                         dataGridViewOpenOrders.DefaultCellStyle.Padding = new Padding(0, 4, 0, 4);
 
-                        // Remove focus border around cells
+                        
                         dataGridViewOpenOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 160, 180);
                         dataGridViewOpenOrders.DefaultCellStyle.SelectionForeColor = Color.White;
                         dataGridViewOpenOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 160, 180);
                         dataGridViewOpenOrders.DefaultCellStyle.SelectionForeColor = Color.White;
 
-                        // Smooth scrolling
+                        
                         dataGridViewOpenOrders.ScrollBars = ScrollBars.Vertical;
 
 
@@ -692,7 +692,7 @@ namespace SokProodos
             {
                 string columnName = dataGridViewOpenOrders.Columns[e.ColumnIndex].Name;
 
-                // Get the SalesOrderID from the clicked row
+                
                 string orderId = dataGridViewOpenOrders.Rows[e.RowIndex].Cells["SalesOrderID"].Value.ToString();
 
                 if (columnName == "Approve")

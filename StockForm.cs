@@ -21,6 +21,13 @@ namespace SokProodos
             LoadProductModels();
             LoadSpecialOffers();
             this.StartPosition = FormStartPosition.CenterScreen;
+            comboBoxMakeFlag.Items.AddRange(new string[] { "Yes", "No" });
+            comboBoxMakeFlag.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxMakeFlag.SelectedIndex = 1; // Default = No
+
+            comboBoxFinishedGoodsFlag.Items.AddRange(new string[] { "Yes", "No" });
+            comboBoxFinishedGoodsFlag.DropDownStyle = ComboBoxStyle.DropDownList;
+            comboBoxFinishedGoodsFlag.SelectedIndex = 1;
             UIStyler.StyleButtonsInForm(this);
             GroupBoxStyler.StyleGroupBoxesInForm(this);
         }
@@ -177,6 +184,7 @@ namespace SokProodos
                         command.Parameters.AddWithValue("@ModelID", modelId > 0 ? (object)modelId : DBNull.Value);
 
                         newProductId = Convert.ToInt32(command.ExecuteScalar());
+
                     }
 
                    
@@ -249,14 +257,12 @@ namespace SokProodos
             int safetyStockLevel, reorderPoint, daysToManufacture, initialStockQuantity;
             string size = textBoxSize.Text.Trim();
 
-            
-            bool makeFlag = textBoxMakeFlag.Text == "1";  
-            bool finishedGoodsFlag = textBoxFinishedGoodsFlag.Text == "1";
+            bool makeFlag = comboBoxMakeFlag.SelectedItem.ToString() == "Yes";
+            bool finishedGoodsFlag = comboBoxFinishedGoodsFlag.SelectedItem.ToString() == "Yes";
 
             int subcategoryId = comboBoxCategory.SelectedItem != null ? ((KeyValuePair<int, string>)comboBoxCategory.SelectedItem).Key : 0;
             int modelId = comboBoxModel.SelectedItem != null ? ((KeyValuePair<int, string>)comboBoxModel.SelectedItem).Key : 0;
 
-            
             if (string.IsNullOrWhiteSpace(productName) || string.IsNullOrWhiteSpace(productNumber))
             {
                 MessageBox.Show("Product Name and Product Number are required.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -284,17 +290,15 @@ namespace SokProodos
                 return;
             }
 
-            
             if (!int.TryParse(textBoxStockQuantity.Text, out initialStockQuantity) || initialStockQuantity < 0)
             {
                 MessageBox.Show("Enter a valid stock quantity (must be 0 or greater).", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            
             int specialOfferId = comboBoxSpecialOffer.SelectedItem != null
                 ? ((KeyValuePair<int, string>)comboBoxSpecialOffer.SelectedItem).Key
-                : 1; 
+                : 1;
 
             string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
 
@@ -304,7 +308,6 @@ namespace SokProodos
                 {
                     connection.Open();
 
-                    
                     string insertProductQuery = @"
             INSERT INTO Production.Product 
             (Name, ProductNumber, Color, StandardCost, ListPrice, Size, Weight, SafetyStockLevel, 
@@ -312,7 +315,7 @@ namespace SokProodos
             VALUES 
             (@Name, @ProductNumber, @Color, @StandardCost, @ListPrice, @Size, @Weight, @SafetyStockLevel, 
              @ReorderPoint, @DaysToManufacture, @SubcategoryID, @ModelID, GETDATE(), @MakeFlag, @FinishedGoodsFlag);
-            SELECT SCOPE_IDENTITY();";  
+            SELECT SCOPE_IDENTITY();";
 
                     int newProductId;
                     using (SqlCommand command = new SqlCommand(insertProductQuery, connection))
@@ -335,7 +338,25 @@ namespace SokProodos
                         newProductId = Convert.ToInt32(command.ExecuteScalar());
                     }
 
-                    textBoxProductID.Text = newProductId.ToString(); 
+                    // Ενημέρωση στο textbox ID
+                    textBoxProductID.Text = newProductId.ToString();
+
+                    // Ενημέρωση αποθέματος
+                    if (initialStockQuantity > 0)
+                    {
+                        string insertInventoryQuery = @"
+                    INSERT INTO Production.ProductInventory 
+                    (ProductID, LocationID, Shelf, Bin, Quantity, ModifiedDate)
+                    VALUES 
+                    (@ProductID, 1, 'A', 1, @Quantity, GETDATE());";
+
+                        using (SqlCommand inventoryCommand = new SqlCommand(insertInventoryQuery, connection))
+                        {
+                            inventoryCommand.Parameters.AddWithValue("@ProductID", newProductId);
+                            inventoryCommand.Parameters.AddWithValue("@Quantity", initialStockQuantity);
+                            inventoryCommand.ExecuteNonQuery();
+                        }
+                    }
 
                     MessageBox.Show("Product and stock added successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -345,6 +366,7 @@ namespace SokProodos
                 }
             }
         }
+
 
 
 
@@ -367,8 +389,14 @@ namespace SokProodos
                 return;
             }
 
-            bool makeFlag = textBoxMakeFlag.Text == "1";
-            bool finishedGoodsFlag = textBoxFinishedGoodsFlag.Text == "1";
+            bool makeFlag = comboBoxMakeFlag.SelectedItem.ToString() == "Yes";
+            bool finishedGoodsFlag = comboBoxFinishedGoodsFlag.SelectedItem.ToString() == "Yes";
+
+            if (!int.TryParse(textBoxStockQuantity.Text.Trim(), out int stockQuantity))
+            {
+                MessageBox.Show("Enter a valid stock quantity (must be 0 or greater).", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
 
@@ -377,21 +405,60 @@ namespace SokProodos
                 try
                 {
                     connection.Open();
-                    string updateQuery = @"
-                UPDATE Production.Product
-                SET MakeFlag = @MakeFlag, FinishedGoodsFlag = @FinishedGoodsFlag, ModifiedDate = GETDATE()
-                WHERE ProductID = @ProductID";
 
-                    using (SqlCommand cmd = new SqlCommand(updateQuery, connection))
+                    string updateProductQuery = @"
+            UPDATE Production.Product
+            SET MakeFlag = @MakeFlag, 
+                FinishedGoodsFlag = @FinishedGoodsFlag, 
+                ModifiedDate = GETDATE()
+            WHERE ProductID = @ProductID";
+
+                    using (SqlCommand cmd = new SqlCommand(updateProductQuery, connection))
                     {
                         cmd.Parameters.AddWithValue("@ProductID", productId);
                         cmd.Parameters.AddWithValue("@MakeFlag", makeFlag ? 1 : 0);
                         cmd.Parameters.AddWithValue("@FinishedGoodsFlag", finishedGoodsFlag ? 1 : 0);
-
                         cmd.ExecuteNonQuery();
                     }
 
-                    MessageBox.Show("Product updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    string checkInventoryQuery = "SELECT COUNT(*) FROM Production.ProductInventory WHERE ProductID = @ProductID";
+
+                    using (SqlCommand checkCmd = new SqlCommand(checkInventoryQuery, connection))
+                    {
+                        checkCmd.Parameters.AddWithValue("@ProductID", productId);
+                        int exists = (int)checkCmd.ExecuteScalar();
+
+                        if (exists > 0)
+                        {
+                            string updateInventoryQuery = @"
+                    UPDATE Production.ProductInventory
+                    SET Quantity = @Quantity,
+                        ModifiedDate = GETDATE()
+                    WHERE ProductID = @ProductID";
+
+                            using (SqlCommand updateInventoryCmd = new SqlCommand(updateInventoryQuery, connection))
+                            {
+                                updateInventoryCmd.Parameters.AddWithValue("@ProductID", productId);
+                                updateInventoryCmd.Parameters.AddWithValue("@Quantity", stockQuantity);
+                                updateInventoryCmd.ExecuteNonQuery();
+                            }
+                        }
+                        else
+                        {
+                            string insertInventoryQuery = @"
+                    INSERT INTO Production.ProductInventory (ProductID, LocationID, Shelf, Bin, Quantity, ModifiedDate)
+                    VALUES (@ProductID, 1, 'A', 1, @Quantity, GETDATE())";
+
+                            using (SqlCommand insertInventoryCmd = new SqlCommand(insertInventoryQuery, connection))
+                            {
+                                insertInventoryCmd.Parameters.AddWithValue("@ProductID", productId);
+                                insertInventoryCmd.Parameters.AddWithValue("@Quantity", stockQuantity);
+                                insertInventoryCmd.ExecuteNonQuery();
+                            }
+                        }
+                    }
+
+                    MessageBox.Show("Product and stock updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
@@ -421,7 +488,7 @@ namespace SokProodos
                 SELECT p.Name, p.ProductNumber, p.Color, p.StandardCost, p.ListPrice, p.Size, p.Weight, 
                        p.SafetyStockLevel, p.ReorderPoint, p.DaysToManufacture, 
                        p.ProductSubcategoryID, p.ProductModelID, p.MakeFlag, p.FinishedGoodsFlag,
-                       ISNULL(pi.Quantity, 0) AS StockQuantity  -- ✅ Stock Quantity from Inventory
+                       ISNULL(pi.Quantity, 0) AS StockQuantity
                 FROM Production.Product p
                 LEFT JOIN Production.ProductInventory pi ON p.ProductID = pi.ProductID
                 WHERE p.ProductID = @ProductID";
@@ -432,29 +499,35 @@ namespace SokProodos
 
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
-                            if (reader.Read())  // ✅ Ensure a record was found
+                            if (reader.Read())
                             {
-                                textBoxProductName.Text = reader["Name"] != DBNull.Value ? reader["Name"].ToString() : "";
-                                textBoxProductNumber.Text = reader["ProductNumber"] != DBNull.Value ? reader["ProductNumber"].ToString() : "";
-                                textBoxColor.Text = reader["Color"] != DBNull.Value ? reader["Color"].ToString() : "";
-                                textBoxStandardCost.Text = reader["StandardCost"] != DBNull.Value ? reader["StandardCost"].ToString() : "0";
-                                textBoxListPrice.Text = reader["ListPrice"] != DBNull.Value ? reader["ListPrice"].ToString() : "0";
-                                textBoxSize.Text = reader["Size"] != DBNull.Value ? reader["Size"].ToString() : "";
-                                textBoxWeight.Text = reader["Weight"] != DBNull.Value ? reader["Weight"].ToString() : "0";
-                                textBoxSafetyStock.Text = reader["SafetyStockLevel"] != DBNull.Value ? reader["SafetyStockLevel"].ToString() : "0";
-                                textBoxReorderPoint.Text = reader["ReorderPoint"] != DBNull.Value ? reader["ReorderPoint"].ToString() : "0";
-                                textBoxDaysToManufacture.Text = reader["DaysToManufacture"] != DBNull.Value ? reader["DaysToManufacture"].ToString() : "0";
-                                textBoxMakeFlag.Text = reader["MakeFlag"] != DBNull.Value ? reader["MakeFlag"].ToString() : "0";
-                                textBoxFinishedGoodsFlag.Text = reader["FinishedGoodsFlag"] != DBNull.Value ? reader["FinishedGoodsFlag"].ToString() : "0";
-                                textBoxStockQuantity.Text = reader["StockQuantity"].ToString(); // ✅ Fills Stock Quantity
+                                textBoxProductName.Text = reader["Name"]?.ToString() ?? "";
+                                textBoxProductNumber.Text = reader["ProductNumber"]?.ToString() ?? "";
+                                textBoxColor.Text = reader["Color"]?.ToString() ?? "";
+                                textBoxStandardCost.Text = reader["StandardCost"]?.ToString() ?? "0";
+                                textBoxListPrice.Text = reader["ListPrice"]?.ToString() ?? "0";
+                                textBoxSize.Text = reader["Size"]?.ToString() ?? "";
+                                textBoxWeight.Text = reader["Weight"]?.ToString() ?? "0";
+                                textBoxSafetyStock.Text = reader["SafetyStockLevel"]?.ToString() ?? "0";
+                                textBoxReorderPoint.Text = reader["ReorderPoint"]?.ToString() ?? "0";
+                                textBoxDaysToManufacture.Text = reader["DaysToManufacture"]?.ToString() ?? "0";
+                                textBoxStockQuantity.Text = reader["StockQuantity"]?.ToString() ?? "0";
 
-                                // ✅ Set Product Category (Subcategory)
+                                // ✅ Set MakeFlag ComboBox
+                                int makeFlag = Convert.ToInt32(reader["MakeFlag"]);
+                                comboBoxMakeFlag.SelectedItem = makeFlag == 1 ? "Yes" : "No";
+
+                                // ✅ Set FinishedGoodsFlag ComboBox
+                                int finishedGoodsFlag = Convert.ToInt32(reader["FinishedGoodsFlag"]);
+                                comboBoxFinishedGoodsFlag.SelectedItem = finishedGoodsFlag == 1 ? "Yes" : "No";
+
+                                // ✅ Set Category (Subcategory)
                                 int subcategoryId = reader["ProductSubcategoryID"] != DBNull.Value ? Convert.ToInt32(reader["ProductSubcategoryID"]) : -1;
                                 if (subcategoryId > 0)
                                 {
-                                    comboBoxCategory.SelectedIndex = comboBoxCategory.FindStringExact(
-                                        comboBoxCategory.Items.Cast<KeyValuePair<int, string>>()
-                                        .FirstOrDefault(kvp => kvp.Key == subcategoryId).Value);
+                                    var categoryItem = comboBoxCategory.Items.Cast<KeyValuePair<int, string>>()
+                                        .FirstOrDefault(kvp => kvp.Key == subcategoryId);
+                                    comboBoxCategory.SelectedIndex = comboBoxCategory.FindStringExact(categoryItem.Value);
                                 }
                                 else
                                 {
@@ -465,9 +538,9 @@ namespace SokProodos
                                 int modelId = reader["ProductModelID"] != DBNull.Value ? Convert.ToInt32(reader["ProductModelID"]) : -1;
                                 if (modelId > 0)
                                 {
-                                    comboBoxModel.SelectedIndex = comboBoxModel.FindStringExact(
-                                        comboBoxModel.Items.Cast<KeyValuePair<int, string>>()
-                                        .FirstOrDefault(kvp => kvp.Key == modelId).Value);
+                                    var modelItem = comboBoxModel.Items.Cast<KeyValuePair<int, string>>()
+                                        .FirstOrDefault(kvp => kvp.Key == modelId);
+                                    comboBoxModel.SelectedIndex = comboBoxModel.FindStringExact(modelItem.Value);
                                 }
                                 else
                                 {

@@ -56,9 +56,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.labelFinishedGoodsFlag = new System.Windows.Forms.Label();
-            this.textBoxFinishedGoodsFlag = new System.Windows.Forms.TextBox();
             this.labelMakeFlag = new System.Windows.Forms.Label();
-            this.textBoxMakeFlag = new System.Windows.Forms.TextBox();
             this.labelProductID = new System.Windows.Forms.Label();
             this.textBoxProductID = new System.Windows.Forms.TextBox();
             this.comboBoxSpecialOffer = new System.Windows.Forms.ComboBox();
@@ -68,6 +66,8 @@
             this.buttonUpdate = new System.Windows.Forms.Button();
             this.buttonFill = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.comboBoxMakeFlag = new System.Windows.Forms.ComboBox();
+            this.comboBoxFinishedGoodsFlag = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -306,10 +306,10 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.comboBoxFinishedGoodsFlag);
+            this.groupBox1.Controls.Add(this.comboBoxMakeFlag);
             this.groupBox1.Controls.Add(this.labelFinishedGoodsFlag);
-            this.groupBox1.Controls.Add(this.textBoxFinishedGoodsFlag);
             this.groupBox1.Controls.Add(this.labelMakeFlag);
-            this.groupBox1.Controls.Add(this.textBoxMakeFlag);
             this.groupBox1.Controls.Add(this.labelProductID);
             this.groupBox1.Controls.Add(this.textBoxProductID);
             this.groupBox1.Controls.Add(this.comboBoxSpecialOffer);
@@ -358,14 +358,6 @@
             this.labelFinishedGoodsFlag.TabIndex = 34;
             this.labelFinishedGoodsFlag.Text = "For Sale?";
             // 
-            // textBoxFinishedGoodsFlag
-            // 
-            this.textBoxFinishedGoodsFlag.Location = new System.Drawing.Point(451, 346);
-            this.textBoxFinishedGoodsFlag.Name = "textBoxFinishedGoodsFlag";
-            this.textBoxFinishedGoodsFlag.Size = new System.Drawing.Size(125, 22);
-            this.textBoxFinishedGoodsFlag.TabIndex = 33;
-            this.textBoxFinishedGoodsFlag.TextChanged += new System.EventHandler(this.textBoxFinishedGoodsFlag_TextChanged);
-            // 
             // labelMakeFlag
             // 
             this.labelMakeFlag.AutoSize = true;
@@ -375,14 +367,6 @@
             this.labelMakeFlag.Size = new System.Drawing.Size(113, 20);
             this.labelMakeFlag.TabIndex = 32;
             this.labelMakeFlag.Text = "For Purchase?";
-            // 
-            // textBoxMakeFlag
-            // 
-            this.textBoxMakeFlag.Location = new System.Drawing.Point(451, 310);
-            this.textBoxMakeFlag.Name = "textBoxMakeFlag";
-            this.textBoxMakeFlag.Size = new System.Drawing.Size(125, 22);
-            this.textBoxMakeFlag.TabIndex = 31;
-            this.textBoxMakeFlag.TextChanged += new System.EventHandler(this.textBoxMakeFlag_TextChanged);
             // 
             // labelProductID
             // 
@@ -473,6 +457,22 @@
             this.pictureBox1.TabIndex = 29;
             this.pictureBox1.TabStop = false;
             // 
+            // comboBoxMakeFlag
+            // 
+            this.comboBoxMakeFlag.FormattingEnabled = true;
+            this.comboBoxMakeFlag.Location = new System.Drawing.Point(451, 309);
+            this.comboBoxMakeFlag.Name = "comboBoxMakeFlag";
+            this.comboBoxMakeFlag.Size = new System.Drawing.Size(125, 24);
+            this.comboBoxMakeFlag.TabIndex = 35;
+            // 
+            // comboBoxFinishedGoodsFlag
+            // 
+            this.comboBoxFinishedGoodsFlag.FormattingEnabled = true;
+            this.comboBoxFinishedGoodsFlag.Location = new System.Drawing.Point(451, 344);
+            this.comboBoxFinishedGoodsFlag.Name = "comboBoxFinishedGoodsFlag";
+            this.comboBoxFinishedGoodsFlag.Size = new System.Drawing.Size(125, 24);
+            this.comboBoxFinishedGoodsFlag.TabIndex = 36;
+            // 
             // StockForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -532,9 +532,9 @@
         private System.Windows.Forms.TextBox textBoxProductID;
         private System.Windows.Forms.Label labelProductID;
         private System.Windows.Forms.Label labelMakeFlag;
-        private System.Windows.Forms.TextBox textBoxMakeFlag;
         private System.Windows.Forms.Label labelFinishedGoodsFlag;
-        private System.Windows.Forms.TextBox textBoxFinishedGoodsFlag;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.ComboBox comboBoxFinishedGoodsFlag;
+        private System.Windows.Forms.ComboBox comboBoxMakeFlag;
     }
 }

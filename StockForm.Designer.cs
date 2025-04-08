@@ -55,6 +55,8 @@
             this.textBoxDaysToManufacture = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.comboBoxFinishedGoodsFlag = new System.Windows.Forms.ComboBox();
+            this.comboBoxMakeFlag = new System.Windows.Forms.ComboBox();
             this.labelFinishedGoodsFlag = new System.Windows.Forms.Label();
             this.labelMakeFlag = new System.Windows.Forms.Label();
             this.labelProductID = new System.Windows.Forms.Label();
@@ -66,8 +68,6 @@
             this.buttonUpdate = new System.Windows.Forms.Button();
             this.buttonFill = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.comboBoxMakeFlag = new System.Windows.Forms.ComboBox();
-            this.comboBoxFinishedGoodsFlag = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -348,6 +348,22 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Product Details";
             // 
+            // comboBoxFinishedGoodsFlag
+            // 
+            this.comboBoxFinishedGoodsFlag.FormattingEnabled = true;
+            this.comboBoxFinishedGoodsFlag.Location = new System.Drawing.Point(451, 344);
+            this.comboBoxFinishedGoodsFlag.Name = "comboBoxFinishedGoodsFlag";
+            this.comboBoxFinishedGoodsFlag.Size = new System.Drawing.Size(125, 24);
+            this.comboBoxFinishedGoodsFlag.TabIndex = 36;
+            // 
+            // comboBoxMakeFlag
+            // 
+            this.comboBoxMakeFlag.FormattingEnabled = true;
+            this.comboBoxMakeFlag.Location = new System.Drawing.Point(451, 309);
+            this.comboBoxMakeFlag.Name = "comboBoxMakeFlag";
+            this.comboBoxMakeFlag.Size = new System.Drawing.Size(125, 24);
+            this.comboBoxMakeFlag.TabIndex = 35;
+            // 
             // labelFinishedGoodsFlag
             // 
             this.labelFinishedGoodsFlag.AutoSize = true;
@@ -456,22 +472,6 @@
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 29;
             this.pictureBox1.TabStop = false;
-            // 
-            // comboBoxMakeFlag
-            // 
-            this.comboBoxMakeFlag.FormattingEnabled = true;
-            this.comboBoxMakeFlag.Location = new System.Drawing.Point(451, 309);
-            this.comboBoxMakeFlag.Name = "comboBoxMakeFlag";
-            this.comboBoxMakeFlag.Size = new System.Drawing.Size(125, 24);
-            this.comboBoxMakeFlag.TabIndex = 35;
-            // 
-            // comboBoxFinishedGoodsFlag
-            // 
-            this.comboBoxFinishedGoodsFlag.FormattingEnabled = true;
-            this.comboBoxFinishedGoodsFlag.Location = new System.Drawing.Point(451, 344);
-            this.comboBoxFinishedGoodsFlag.Name = "comboBoxFinishedGoodsFlag";
-            this.comboBoxFinishedGoodsFlag.Size = new System.Drawing.Size(125, 24);
-            this.comboBoxFinishedGoodsFlag.TabIndex = 36;
             // 
             // StockForm
             // 

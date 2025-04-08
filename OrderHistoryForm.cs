@@ -221,7 +221,7 @@ namespace SokProodos
                         DataTable dataTable = new DataTable();
                         adapter.Fill(dataTable);
                         dataGridViewOrderHistory.DataSource = dataTable;
-                        ApplyApprovalStatusColors(); // Χρωματισμός των γραμμών
+                        ApplyApprovalStatusColors(); 
                     }
                 }
                 catch (Exception ex)

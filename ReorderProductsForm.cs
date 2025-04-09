@@ -14,6 +14,11 @@ namespace SokProodos
     public partial class ReorderProductsForm: Form
     {
         private string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
+        private DataTable productTable; // Add this at the top of the class
+        private List<string> allProductNames = new List<string>();
+
+
+
         public ReorderProductsForm()
         {
             InitializeComponent();
@@ -27,8 +32,43 @@ namespace SokProodos
             checkBoxCriticalOnly.CheckedChanged += FiltersChanged;
             checkBoxBuiltInHouse.CheckedChanged += FiltersChanged;
             checkBoxModifiedRecently.CheckedChanged += FiltersChanged;
-
+            comboBoxSearchProducts.DropDownStyle = ComboBoxStyle.DropDown;           
+            comboBoxSearchProducts.TextChanged += ComboBoxSearchProducts_TextChanged;          
         }
+           
+        private void ComboBoxSearchProducts_TextChanged(object sender, EventArgs e)
+        {
+            string typedText = comboBoxSearchProducts.Text;
+
+            if (string.IsNullOrWhiteSpace(typedText))
+            {
+                dataGridViewReorderProducts.DataSource = productTable;
+                UpdateSearchComboBoxItems(allProductNames);
+                return;
+            }
+
+            var filteredRows = productTable.AsEnumerable()
+                .Where(r => r.Field<string>("Name").IndexOf(typedText, StringComparison.OrdinalIgnoreCase) >= 0);
+
+            if (filteredRows.Any())
+            {
+                dataGridViewReorderProducts.DataSource = filteredRows.CopyToDataTable();
+
+                // Update dropdown items too
+                var filteredNames = filteredRows
+                    .Select(r => r.Field<string>("Name"))
+                    .Distinct()
+                    .ToList();
+
+                UpdateSearchComboBoxItems(filteredNames);
+            }
+            else
+            {
+                dataGridViewReorderProducts.DataSource = productTable.Clone();
+                comboBoxSearchProducts.DroppedDown = false;
+            }
+        }
+
 
         private void StyleReorderProductsGrid()
         {
@@ -115,7 +155,7 @@ namespace SokProodos
                 }
             }
 
-            // Add editable column
+            // Add extra columns
             dt.Columns.Add("QuantityToReorder", typeof(int));
             dt.Columns.Add("Select", typeof(bool));
 
@@ -127,7 +167,6 @@ namespace SokProodos
                 row["Select"] = false;
             }
 
-            // Apply critical stock filter after loading (not in SQL)
             if (filterCritical)
             {
                 dt = dt.AsEnumerable()
@@ -136,6 +175,29 @@ namespace SokProodos
             }
 
             dataGridViewReorderProducts.DataSource = dt;
+            productTable = dt;
+
+            // Initialize ComboBox search list
+            allProductNames = dt.AsEnumerable()
+                .Select(r => r.Field<string>("Name"))
+                .Distinct()
+                .ToList();
+
+            UpdateSearchComboBoxItems(allProductNames);
+        }
+
+        private void UpdateSearchComboBoxItems(List<string> items)
+        {
+            string currentText = comboBoxSearchProducts.Text;
+
+            comboBoxSearchProducts.TextChanged -= ComboBoxSearchProducts_TextChanged;
+            comboBoxSearchProducts.Items.Clear();
+            comboBoxSearchProducts.Items.AddRange(items.ToArray());
+            comboBoxSearchProducts.Text = currentText;
+            comboBoxSearchProducts.SelectionStart = currentText.Length;
+            comboBoxSearchProducts.SelectionLength = 0;           
+            Cursor.Current = Cursors.Default;
+            comboBoxSearchProducts.TextChanged += ComboBoxSearchProducts_TextChanged;
         }
 
 
@@ -290,8 +352,6 @@ namespace SokProodos
             buttonApplyFilters_Click(sender, e); // Reuse logic
         }
 
-
-
         private void buttonApplyFilters_Click(object sender, EventArgs e)
         {
             bool criticalOnly = checkBoxCriticalOnly.Checked;
@@ -323,12 +383,19 @@ namespace SokProodos
                     return;
                 }
 
-                // ✅ Create and show the new form
+                
                 OrderLowStockForm orderForm = new OrderLowStockForm(selectedRows);
                 orderForm.Show();
 
-                this.Hide(); // hide only after showing new form
+                this.Hide(); 
             }
         }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        
     }
 }

@@ -1294,10 +1294,7 @@ namespace SokProodos
 
         private void labelReorderProducts_Click(object sender, EventArgs e)
         {
-            ReorderProductsForm reorderForm = new ReorderProductsForm();
-            reorderForm.Show();
-
-            this.Hide();
+           
         }
 
         private void buttonToggleInfo_Click(object sender, EventArgs e)

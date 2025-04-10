@@ -39,6 +39,7 @@
             this.comboBoxSearchProducts = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.buttonSelectAll = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewReorderProducts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -57,7 +58,7 @@
             // dataGridViewReorderProducts
             // 
             this.dataGridViewReorderProducts.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewReorderProducts.Location = new System.Drawing.Point(333, 12);
+            this.dataGridViewReorderProducts.Location = new System.Drawing.Point(325, 71);
             this.dataGridViewReorderProducts.Name = "dataGridViewReorderProducts";
             this.dataGridViewReorderProducts.Size = new System.Drawing.Size(703, 391);
             this.dataGridViewReorderProducts.TabIndex = 1;
@@ -109,7 +110,7 @@
             // buttonReorderSelected
             // 
             this.buttonReorderSelected.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonReorderSelected.Location = new System.Drawing.Point(757, 528);
+            this.buttonReorderSelected.Location = new System.Drawing.Point(12, 481);
             this.buttonReorderSelected.Name = "buttonReorderSelected";
             this.buttonReorderSelected.Size = new System.Drawing.Size(144, 37);
             this.buttonReorderSelected.TabIndex = 9;
@@ -120,9 +121,9 @@
             // pictureBox1
             // 
             this.pictureBox1.Image = global::SokProodos.Properties.Resources.pngwing_com__18_;
-            this.pictureBox1.Location = new System.Drawing.Point(-18, -7);
+            this.pictureBox1.Location = new System.Drawing.Point(-18, -11);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(1077, 581);
+            this.pictureBox1.Size = new System.Drawing.Size(1077, 594);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 10;
             this.pictureBox1.TabStop = false;
@@ -159,11 +160,23 @@
             this.groupBox1.TabIndex = 13;
             this.groupBox1.TabStop = false;
             // 
+            // buttonSelectAll
+            // 
+            this.buttonSelectAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonSelectAll.Location = new System.Drawing.Point(12, 444);
+            this.buttonSelectAll.Name = "buttonSelectAll";
+            this.buttonSelectAll.Size = new System.Drawing.Size(144, 31);
+            this.buttonSelectAll.TabIndex = 14;
+            this.buttonSelectAll.Text = "Select All";
+            this.buttonSelectAll.UseVisualStyleBackColor = true;
+            this.buttonSelectAll.Click += new System.EventHandler(this.buttonSelectAll_Click);
+            // 
             // ReorderProductsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1048, 574);
+            this.Controls.Add(this.buttonSelectAll);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.buttonReorderSelected);
             this.Controls.Add(this.buttonApplyFilters);
@@ -194,5 +207,6 @@
         private System.Windows.Forms.ComboBox comboBoxSearchProducts;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button buttonSelectAll;
     }
 }

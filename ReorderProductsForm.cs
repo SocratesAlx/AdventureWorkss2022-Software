@@ -11,7 +11,7 @@ using System.Windows.Forms;
 
 namespace SokProodos
 {
-    public partial class ReorderProductsForm: Form
+    public partial class ReorderProductsForm : Form
     {
         private string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
         private DataTable productTable; // Add this at the top of the class
@@ -32,10 +32,10 @@ namespace SokProodos
             checkBoxCriticalOnly.CheckedChanged += FiltersChanged;
             checkBoxBuiltInHouse.CheckedChanged += FiltersChanged;
             checkBoxModifiedRecently.CheckedChanged += FiltersChanged;
-            comboBoxSearchProducts.DropDownStyle = ComboBoxStyle.DropDown;           
-            comboBoxSearchProducts.TextChanged += ComboBoxSearchProducts_TextChanged;          
+            comboBoxSearchProducts.DropDownStyle = ComboBoxStyle.DropDown;
+            comboBoxSearchProducts.TextChanged += ComboBoxSearchProducts_TextChanged;
         }
-           
+
         private void ComboBoxSearchProducts_TextChanged(object sender, EventArgs e)
         {
             string typedText = comboBoxSearchProducts.Text;
@@ -195,106 +195,106 @@ namespace SokProodos
             comboBoxSearchProducts.Items.AddRange(items.ToArray());
             comboBoxSearchProducts.Text = currentText;
             comboBoxSearchProducts.SelectionStart = currentText.Length;
-            comboBoxSearchProducts.SelectionLength = 0;           
+            comboBoxSearchProducts.SelectionLength = 0;
             Cursor.Current = Cursors.Default;
             comboBoxSearchProducts.TextChanged += ComboBoxSearchProducts_TextChanged;
         }
 
 
         private void InitializeReorderGrid()
-{
-    dataGridViewReorderProducts.Columns.Clear();
+        {
+            dataGridViewReorderProducts.Columns.Clear();
 
-    // Select Checkbox (for batch reorder)
-    DataGridViewCheckBoxColumn colSelect = new DataGridViewCheckBoxColumn
-    {
-        Name = "Select",
-        HeaderText = "",
-        DataPropertyName = "Select",
-        Width = 30
-    };
+            // Select Checkbox (for batch reorder)
+            DataGridViewCheckBoxColumn colSelect = new DataGridViewCheckBoxColumn
+            {
+                Name = "Select",
+                HeaderText = "",
+                DataPropertyName = "Select",
+                Width = 30
+            };
 
-    // ProductID (hidden)
-    DataGridViewTextBoxColumn colProductID = new DataGridViewTextBoxColumn
-    {
-        Name = "ProductID",
-        HeaderText = "Product ID",
-        DataPropertyName = "ProductID",
-        Visible = false
-    };
+            // ProductID (hidden)
+            DataGridViewTextBoxColumn colProductID = new DataGridViewTextBoxColumn
+            {
+                Name = "ProductID",
+                HeaderText = "Product ID",
+                DataPropertyName = "ProductID",
+                Visible = false
+            };
 
-    // Product Name (FILL)
-    DataGridViewTextBoxColumn colProductName = new DataGridViewTextBoxColumn
-    {
-        Name = "ProductName",
-        HeaderText = "Product Name",
-        DataPropertyName = "Name",
-        ReadOnly = true,
-        AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
-        MinimumWidth = 150
-    };
+            // Product Name (FILL)
+            DataGridViewTextBoxColumn colProductName = new DataGridViewTextBoxColumn
+            {
+                Name = "ProductName",
+                HeaderText = "Product Name",
+                DataPropertyName = "Name",
+                ReadOnly = true,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill,
+                MinimumWidth = 150
+            };
 
-    // Current Quantity
-    DataGridViewTextBoxColumn colQty = new DataGridViewTextBoxColumn
-    {
-        Name = "Quantity",
-        HeaderText = "Current Quantity",
-        DataPropertyName = "Quantity",
-        ReadOnly = true,
-        AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-    };
+            // Current Quantity
+            DataGridViewTextBoxColumn colQty = new DataGridViewTextBoxColumn
+            {
+                Name = "Quantity",
+                HeaderText = "Current Quantity",
+                DataPropertyName = "Quantity",
+                ReadOnly = true,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+            };
 
-    // Reorder Point
-    DataGridViewTextBoxColumn colReorder = new DataGridViewTextBoxColumn
-    {
-        Name = "ReorderPoint",
-        HeaderText = "Reorder Point",
-        DataPropertyName = "ReorderPoint",
-        ReadOnly = true,
-        AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-    };
+            // Reorder Point
+            DataGridViewTextBoxColumn colReorder = new DataGridViewTextBoxColumn
+            {
+                Name = "ReorderPoint",
+                HeaderText = "Reorder Point",
+                DataPropertyName = "ReorderPoint",
+                ReadOnly = true,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+            };
 
-    // Safety Stock Level
-    DataGridViewTextBoxColumn colSafety = new DataGridViewTextBoxColumn
-    {
-        Name = "SafetyStockLevel",
-        HeaderText = "Safety Stock",
-        DataPropertyName = "SafetyStockLevel",
-        ReadOnly = true,
-        AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-    };
+            // Safety Stock Level
+            DataGridViewTextBoxColumn colSafety = new DataGridViewTextBoxColumn
+            {
+                Name = "SafetyStockLevel",
+                HeaderText = "Safety Stock",
+                DataPropertyName = "SafetyStockLevel",
+                ReadOnly = true,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+            };
 
-    // MakeFlag (readonly)
-    DataGridViewTextBoxColumn colMakeFlag = new DataGridViewTextBoxColumn
-    {
-        Name = "MakeFlag",
-        HeaderText = "Built In-House",
-        DataPropertyName = "MakeFlag",
-        ReadOnly = true,
-        AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-    };
+            // MakeFlag (readonly)
+            DataGridViewTextBoxColumn colMakeFlag = new DataGridViewTextBoxColumn
+            {
+                Name = "MakeFlag",
+                HeaderText = "Built In-House",
+                DataPropertyName = "MakeFlag",
+                ReadOnly = true,
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+            };
 
-    // Quantity To Reorder (editable)
-    DataGridViewTextBoxColumn colQtyToReorder = new DataGridViewTextBoxColumn
-    {
-        Name = "QuantityToReorder",
-        HeaderText = "Qty To Reorder",
-        DataPropertyName = "QuantityToReorder",
-        AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
-    };
+            // Quantity To Reorder (editable)
+            DataGridViewTextBoxColumn colQtyToReorder = new DataGridViewTextBoxColumn
+            {
+                Name = "QuantityToReorder",
+                HeaderText = "Qty To Reorder",
+                DataPropertyName = "QuantityToReorder",
+                AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
+            };
 
-    // Add all to grid
-    dataGridViewReorderProducts.Columns.AddRange(
-        colSelect,
-        colProductID,
-        colProductName,
-        colQty,
-        colReorder,
-        colSafety,
-        colMakeFlag,
-        colQtyToReorder
-    );
-}
+            // Add all to grid
+            dataGridViewReorderProducts.Columns.AddRange(
+                colSelect,
+                colProductID,
+                colProductName,
+                colQty,
+                colReorder,
+                colSafety,
+                colMakeFlag,
+                colQtyToReorder
+            );
+        }
 
 
 
@@ -313,13 +313,13 @@ namespace SokProodos
 
                 int criticalThreshold = safetyStock / 3;
 
-                // 🔴 CRITICAL LOW: Quantity below 1/3 of safety stock
+                // Quantity below 1/3 of safety stock
                 if (quantity < criticalThreshold)
                 {
                     row.DefaultCellStyle.BackColor = Color.LightCoral;
                     row.DefaultCellStyle.ForeColor = Color.White;
                 }
-                // 🟠 LOW STOCK: Quantity below reorder point but not critical
+                // Quantity below reorder point but not critical
                 else if (quantity < reorderPoint)
                 {
                     row.DefaultCellStyle.BackColor = Color.MistyRose;
@@ -328,7 +328,7 @@ namespace SokProodos
             }
             catch (Exception ex)
             {
-                // Optional: log or debug
+                // log or debug
                 Console.WriteLine($"Formatting error on row {e.RowIndex}: {ex.Message}");
             }
         }
@@ -357,7 +357,7 @@ namespace SokProodos
             bool criticalOnly = checkBoxCriticalOnly.Checked;
             bool builtIn = checkBoxBuiltInHouse.Checked;
             bool recent = checkBoxModifiedRecently.Checked;
-            
+
             InitializeReorderGrid();
             LoadReorderProducts(criticalOnly, builtIn, recent);
         }
@@ -383,19 +383,74 @@ namespace SokProodos
                     return;
                 }
 
-                
+
                 OrderLowStockForm orderForm = new OrderLowStockForm(selectedRows);
                 orderForm.Show();
 
-                this.Hide(); 
+                this.Hide();
             }
+        }
+
+        private void SelectAllProductsInGrid(bool selectAll = true)
+        {
+            if (productTable == null) return;
+
+            // Detach to avoid UI lag
+            dataGridViewReorderProducts.DataSource = null;
+
+            foreach (DataRow row in productTable.Rows)
+            {
+                row["Select"] = selectAll;
+            }
+
+            // Rebind and reinitialize grid
+            InitializeReorderGrid();
+            dataGridViewReorderProducts.DataSource = productTable;
+
+            // Optional: preserve styling
+            StyleReorderProductsGrid();
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
         {
 
         }
+        private bool allSelected = false;
 
-        
+        private void buttonSelectAll_Click(object sender, EventArgs e)
+        {
+            allSelected = !allSelected;
+
+            SelectAllProductsInGrid(allSelected);
+
+            buttonSelectAll.Text = allSelected ? "Deselect All" : "Select All";
+
+            // 🔶 Change color dynamically
+            if (allSelected)
+            {
+                // Orange mode
+                buttonSelectAll.BackColor = Color.Orange;
+                buttonSelectAll.MouseEnter += OrangeHover;
+                buttonSelectAll.MouseLeave += OrangeLeave;
+            }
+            else
+            {
+                // Teal default mode
+                buttonSelectAll.MouseEnter -= OrangeHover;
+                buttonSelectAll.MouseLeave -= OrangeLeave;
+                buttonSelectAll.BackColor = Color.FromArgb(0, 160, 180); // Reset to base
+            }
+        }
+
+        // 🔶 Custom hover behavior for orange mode
+        private void OrangeHover(object sender, EventArgs e)
+        {
+            buttonSelectAll.BackColor = Color.DarkOrange;
+        }
+
+        private void OrangeLeave(object sender, EventArgs e)
+        {
+            buttonSelectAll.BackColor = Color.Orange;
+        }
     }
 }

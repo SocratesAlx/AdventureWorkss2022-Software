@@ -72,37 +72,44 @@ namespace SokProodos
 
         private void StyleReorderProductsGrid()
         {
-            // Disable default header styles
+            // Basic UI tweaks
             dataGridViewReorderProducts.EnableHeadersVisualStyles = false;
+            dataGridViewReorderProducts.BorderStyle = BorderStyle.None;
+            dataGridViewReorderProducts.RowHeadersVisible = false;
 
-            // Header styling
-            dataGridViewReorderProducts.ColumnHeadersDefaultCellStyle.BackColor = Color.White;
-            dataGridViewReorderProducts.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black;
-            dataGridViewReorderProducts.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
+            // Header style
+            dataGridViewReorderProducts.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245);
+            dataGridViewReorderProducts.ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(40, 40, 40);
+            dataGridViewReorderProducts.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
 
-            // Cell styling
+            dataGridViewReorderProducts.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewReorderProducts.ColumnHeadersHeight = 35;
+
+            // Cell style
             dataGridViewReorderProducts.DefaultCellStyle.BackColor = Color.White;
             dataGridViewReorderProducts.DefaultCellStyle.ForeColor = Color.Black;
             dataGridViewReorderProducts.DefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Regular);
+            dataGridViewReorderProducts.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewReorderProducts.DefaultCellStyle.Padding = new Padding(4, 2, 4, 2);
 
-            // Alternate row coloring
-            dataGridViewReorderProducts.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245);
+            // Alternating rows
+            dataGridViewReorderProducts.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 248, 255);
 
-            // Border + grid style
-            dataGridViewReorderProducts.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dataGridViewReorderProducts.GridColor = Color.FromArgb(200, 200, 200);
+            // Grid & borders
+            dataGridViewReorderProducts.CellBorderStyle = DataGridViewCellBorderStyle.None;
+            dataGridViewReorderProducts.GridColor = Color.Gainsboro;
 
-            // Column sizing
+            // Columns
             dataGridViewReorderProducts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dataGridViewReorderProducts.AutoResizeColumns();
             dataGridViewReorderProducts.ScrollBars = ScrollBars.Both;
 
-            // Optional: hover effect
+            // Hover effect
             dataGridViewReorderProducts.CellMouseEnter += (s, e) =>
             {
                 if (e.RowIndex >= 0)
                 {
-                    dataGridViewReorderProducts.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.FromArgb(230, 230, 230);
+                    dataGridViewReorderProducts.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.FromArgb(235, 240, 255);
                 }
             };
 
@@ -112,11 +119,12 @@ namespace SokProodos
                 {
                     Color altBack = e.RowIndex % 2 == 0
                         ? Color.White
-                        : Color.FromArgb(245, 245, 245);
+                        : Color.FromArgb(245, 248, 255);
                     dataGridViewReorderProducts.Rows[e.RowIndex].DefaultCellStyle.BackColor = altBack;
                 }
             };
         }
+
 
         private void LoadReorderProducts(bool filterCritical = false, bool filterMakeFlag = false, bool filterRecent = false)
         {
@@ -295,6 +303,7 @@ namespace SokProodos
                 colQtyToReorder
             );
         }
+
 
 
 

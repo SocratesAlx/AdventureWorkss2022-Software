@@ -40,6 +40,8 @@
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.buttonSelectAll = new System.Windows.Forms.Button();
+            this.buttonSelectBelowSafety = new System.Windows.Forms.Button();
+            this.buttonSelectBelowReorder = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewReorderProducts)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -110,7 +112,7 @@
             // buttonReorderSelected
             // 
             this.buttonReorderSelected.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonReorderSelected.Location = new System.Drawing.Point(12, 481);
+            this.buttonReorderSelected.Location = new System.Drawing.Point(619, 492);
             this.buttonReorderSelected.Name = "buttonReorderSelected";
             this.buttonReorderSelected.Size = new System.Drawing.Size(144, 37);
             this.buttonReorderSelected.TabIndex = 9;
@@ -163,19 +165,42 @@
             // buttonSelectAll
             // 
             this.buttonSelectAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonSelectAll.Location = new System.Drawing.Point(12, 444);
+            this.buttonSelectAll.Location = new System.Drawing.Point(33, 327);
             this.buttonSelectAll.Name = "buttonSelectAll";
-            this.buttonSelectAll.Size = new System.Drawing.Size(144, 31);
+            this.buttonSelectAll.Size = new System.Drawing.Size(131, 31);
             this.buttonSelectAll.TabIndex = 14;
             this.buttonSelectAll.Text = "Select All";
             this.buttonSelectAll.UseVisualStyleBackColor = true;
             this.buttonSelectAll.Click += new System.EventHandler(this.buttonSelectAll_Click);
+            // 
+            // buttonSelectBelowSafety
+            // 
+            this.buttonSelectBelowSafety.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonSelectBelowSafety.Location = new System.Drawing.Point(33, 365);
+            this.buttonSelectBelowSafety.Name = "buttonSelectBelowSafety";
+            this.buttonSelectBelowSafety.Size = new System.Drawing.Size(131, 31);
+            this.buttonSelectBelowSafety.TabIndex = 15;
+            this.buttonSelectBelowSafety.Text = "Select Below Safety";
+            this.buttonSelectBelowSafety.UseVisualStyleBackColor = true;
+            this.buttonSelectBelowSafety.Click += new System.EventHandler(this.buttonSelectBelowSafety_Click);
+            // 
+            // buttonSelectBelowReorder
+            // 
+            this.buttonSelectBelowReorder.Location = new System.Drawing.Point(33, 403);
+            this.buttonSelectBelowReorder.Name = "buttonSelectBelowReorder";
+            this.buttonSelectBelowReorder.Size = new System.Drawing.Size(131, 31);
+            this.buttonSelectBelowReorder.TabIndex = 16;
+            this.buttonSelectBelowReorder.Text = "Select Below Reorder";
+            this.buttonSelectBelowReorder.UseVisualStyleBackColor = true;
+            this.buttonSelectBelowReorder.Click += new System.EventHandler(this.buttonSelectBelowReorder_Click);
             // 
             // ReorderProductsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1048, 574);
+            this.Controls.Add(this.buttonSelectBelowReorder);
+            this.Controls.Add(this.buttonSelectBelowSafety);
             this.Controls.Add(this.buttonSelectAll);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.buttonReorderSelected);
@@ -208,5 +233,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button buttonSelectAll;
+        private System.Windows.Forms.Button buttonSelectBelowSafety;
+        private System.Windows.Forms.Button buttonSelectBelowReorder;
     }
 }

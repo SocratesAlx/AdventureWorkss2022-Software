@@ -425,6 +425,10 @@ namespace SokProodos
 
         }
         private bool allSelected = false;
+        private bool safetySelected = false;
+        private bool reorderSelected = false;
+
+
 
         private void buttonSelectAll_Click(object sender, EventArgs e)
         {
@@ -433,33 +437,192 @@ namespace SokProodos
             SelectAllProductsInGrid(allSelected);
 
             buttonSelectAll.Text = allSelected ? "Deselect All" : "Select All";
-
-            // 🔶 Change color dynamically
-            if (allSelected)
-            {
-                // Orange mode
-                buttonSelectAll.BackColor = Color.Orange;
-                buttonSelectAll.MouseEnter += OrangeHover;
-                buttonSelectAll.MouseLeave += OrangeLeave;
-            }
-            else
-            {
-                // Teal default mode
-                buttonSelectAll.MouseEnter -= OrangeHover;
-                buttonSelectAll.MouseLeave -= OrangeLeave;
-                buttonSelectAll.BackColor = Color.FromArgb(0, 160, 180); // Reset to base
-            }
+            ToggleButtonColor(buttonSelectAll, allSelected);
         }
 
         // 🔶 Custom hover behavior for orange mode
         private void OrangeHover(object sender, EventArgs e)
         {
-            buttonSelectAll.BackColor = Color.DarkOrange;
+            if (sender is Button btn)
+                btn.BackColor = Color.DarkOrange;
         }
+
+
+        private void SelectBelowSafetyStock()
+        {
+            if (productTable == null) return;
+
+            dataGridViewReorderProducts.DataSource = null;
+
+            foreach (DataRow row in productTable.Rows)
+            {
+                int quantity = Convert.ToInt32(row["Quantity"]);
+                int safetyStock = Convert.ToInt32(row["SafetyStockLevel"]);
+                row["Select"] = quantity < safetyStock;
+            }
+
+            InitializeReorderGrid();
+            dataGridViewReorderProducts.DataSource = productTable;
+            StyleReorderProductsGrid();
+        }
+
+        private void SelectBelowReorderPoint()
+        {
+            if (productTable == null) return;
+
+            dataGridViewReorderProducts.DataSource = null;
+
+            foreach (DataRow row in productTable.Rows)
+            {
+                int quantity = Convert.ToInt32(row["Quantity"]);
+                int reorderPoint = Convert.ToInt32(row["ReorderPoint"]);
+                row["Select"] = quantity < reorderPoint;
+            }
+
+            InitializeReorderGrid();
+            dataGridViewReorderProducts.DataSource = productTable;
+            StyleReorderProductsGrid();
+        }
+        
+        
+
+        private void ToggleSelectBelowSafetyStock(Button triggerButton)
+        {
+            safetySelected = !safetySelected;
+
+            if (productTable == null) return;
+
+            dataGridViewReorderProducts.DataSource = null;
+
+            foreach (DataRow row in productTable.Rows)
+            {
+                int quantity = Convert.ToInt32(row["Quantity"]);
+                int safetyStock = Convert.ToInt32(row["SafetyStockLevel"]);
+                row["Select"] = safetySelected && quantity < safetyStock;
+            }
+
+            InitializeReorderGrid();
+            dataGridViewReorderProducts.DataSource = productTable;
+            StyleReorderProductsGrid();
+
+            triggerButton.Text = safetySelected ? "Deselect Safety Stock" : "Select Below Safety Stock";
+
+            // 🔶 Toggle color + hover
+            if (safetySelected)
+            {
+                triggerButton.BackColor = Color.Orange;
+                triggerButton.MouseEnter += OrangeHover;
+                triggerButton.MouseLeave += OrangeLeave;
+            }
+            else
+            {
+                triggerButton.MouseEnter -= OrangeHover;
+                triggerButton.MouseLeave -= OrangeLeave;
+                triggerButton.BackColor = Color.FromArgb(0, 160, 180);
+            }
+        }
+
+
+        private void ToggleSelectBelowReorderPoint(Button triggerButton)
+        {
+            reorderSelected = !reorderSelected;
+
+            if (productTable == null) return;
+
+            dataGridViewReorderProducts.DataSource = null;
+
+            foreach (DataRow row in productTable.Rows)
+            {
+                int quantity = Convert.ToInt32(row["Quantity"]);
+                int reorderPoint = Convert.ToInt32(row["ReorderPoint"]);
+                row["Select"] = reorderSelected && quantity < reorderPoint;
+            }
+
+            InitializeReorderGrid();
+            dataGridViewReorderProducts.DataSource = productTable;
+            StyleReorderProductsGrid();
+
+            triggerButton.Text = reorderSelected ? "Deselect Reorder Point" : "Select Below Reorder Point";
+
+            // 🔶 Toggle color + hover
+            if (reorderSelected)
+            {
+                triggerButton.BackColor = Color.Orange;
+                triggerButton.MouseEnter += OrangeHover;
+                triggerButton.MouseLeave += OrangeLeave;
+            }
+            else
+            {
+                triggerButton.MouseEnter -= OrangeHover;
+                triggerButton.MouseLeave -= OrangeLeave;
+                triggerButton.BackColor = Color.FromArgb(0, 160, 180);
+            }
+        }
+
+
+
 
         private void OrangeLeave(object sender, EventArgs e)
         {
-            buttonSelectAll.BackColor = Color.Orange;
+            if (sender is Button btn)
+                btn.BackColor = Color.Orange;
+        }
+
+        private void buttonSelectBelowSafety_Click(object sender, EventArgs e)
+        {
+            safetySelected = !safetySelected;
+            ToggleSelectWithCondition((Button)sender, safetySelected, row =>
+            {
+                int quantity = Convert.ToInt32(row["Quantity"]);
+                int safetyStock = Convert.ToInt32(row["SafetyStockLevel"]);
+                return quantity < safetyStock;
+            }, "Select Below Safety Stock", "Deselect Safety Stock");
+
+        }
+
+        private void buttonSelectBelowReorder_Click(object sender, EventArgs e)
+        {
+            reorderSelected = !reorderSelected;
+            ToggleSelectWithCondition((Button)sender, reorderSelected, row =>
+            {
+                int quantity = Convert.ToInt32(row["Quantity"]);
+                int reorderPoint = Convert.ToInt32(row["ReorderPoint"]);
+                return quantity < reorderPoint;
+            }, "Select Below Reorder Point", "Deselect Reorder Point");
+
+        }
+        private void ToggleSelectWithCondition(Button triggerButton, bool isSelected, Func<DataRow, bool> condition, string labelSelect, string labelDeselect)
+        {
+            if (productTable == null) return;
+
+            dataGridViewReorderProducts.DataSource = null;
+
+            foreach (DataRow row in productTable.Rows)
+            {
+                row["Select"] = isSelected && condition(row);
+            }
+
+            InitializeReorderGrid();
+            dataGridViewReorderProducts.DataSource = productTable;
+            StyleReorderProductsGrid();
+
+            triggerButton.Text = isSelected ? labelDeselect : labelSelect;
+            ToggleButtonColor(triggerButton, isSelected);
+        }
+        private void ToggleButtonColor(Button btn, bool active)
+        {
+            if (active)
+            {
+                btn.BackColor = Color.Orange;
+                btn.MouseEnter += OrangeHover;
+                btn.MouseLeave += OrangeLeave;
+            }
+            else
+            {
+                btn.MouseEnter -= OrangeHover;
+                btn.MouseLeave -= OrangeLeave;
+                btn.BackColor = Color.FromArgb(0, 160, 180);
+            }
         }
     }
 }

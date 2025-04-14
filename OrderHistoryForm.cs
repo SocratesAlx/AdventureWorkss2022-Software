@@ -177,51 +177,60 @@ namespace SokProodos
                 {
                     connection.Open();
 
-                    string query = @"
-                SELECT 
-                    soh.SalesOrderID AS 'Order ID',
-                    soh.OrderDate AS 'Order Date',
-                    soh.DueDate AS 'Due Date',
-                    c.CustomerID AS 'Customer ID',
-                    ISNULL(p.FirstName + ' ' + p.LastName, s.Name) AS 'Customer Name',
-                    sp.BusinessEntityID AS 'Seller ID',
-                    per.FirstName + ' ' + per.LastName AS 'Seller Name',
-                    soh.TotalDue AS 'Total Amount',
-                    sm.Name AS 'Shipping Method',
-                    soh.BillToAddressID AS 'Billing Address ID',
-                    a.AddressLine1 + ', ' + a.City AS 'Billing Address',
-                    sod.SpecialOfferID AS 'Special Offer ID',
-                    so.Description AS 'Special Offer',
-                    sod.OrderQty AS 'Order Quantity',
-                    sod.UnitPrice AS 'Unit Price',
-                    (sod.UnitPrice * sod.OrderQty) AS 'Total Price',
-                    sod.ProductID AS 'Product ID',
-                    pr.Name AS 'Product Name',
-                    CASE 
-                        WHEN oa.Approved = 1 THEN 'Approved'
-                        WHEN oa.Approved = 0 THEN 'Rejected'
-                        ELSE 'Pending'
-                    END AS 'Approval Status'
-                FROM Sales.SalesOrderHeader soh
-                JOIN Sales.Customer c ON soh.CustomerID = c.CustomerID
-                LEFT JOIN Person.Person p ON c.PersonID = p.BusinessEntityID
-                LEFT JOIN Sales.Store s ON c.StoreID = s.BusinessEntityID
-                LEFT JOIN Sales.SalesPerson sp ON soh.SalesPersonID = sp.BusinessEntityID
-                LEFT JOIN Person.Person per ON sp.BusinessEntityID = per.BusinessEntityID
-                LEFT JOIN Sales.SalesOrderDetail sod ON soh.SalesOrderID = sod.SalesOrderID
-                LEFT JOIN Sales.SpecialOffer so ON sod.SpecialOfferID = so.SpecialOfferID
-                LEFT JOIN Purchasing.ShipMethod sm ON soh.ShipMethodID = sm.ShipMethodID
-                LEFT JOIN Person.Address a ON soh.BillToAddressID = a.AddressID
-                LEFT JOIN Production.Product pr ON sod.ProductID = pr.ProductID
-                LEFT JOIN OrderApprovals oa ON soh.SalesOrderID = oa.SalesOrderID
-                ORDER BY soh.OrderDate DESC;";
+                    string combinedQuery = @"
+            -- SALES ORDERS
+            SELECT 
+                soh.SalesOrderID AS [Order ID],
+                soh.OrderDate AS [Order Date],
+                soh.DueDate AS [Due Date],
+                ISNULL(p.FirstName + ' ' + p.LastName, s.Name) AS [Customer/Vendor],
+                per.FirstName + ' ' + per.LastName AS [Employee],
+                sm.Name AS [Ship Method],
+                soh.TotalDue AS [Total],
+                'Sales' AS [Order Type],
+                CASE 
+                    WHEN oa.Approved = 1 THEN 'Approved'
+                    WHEN oa.Approved = 0 THEN 'Rejected'
+                    ELSE 'Pending'
+                END AS [Approval Status]
+            FROM Sales.SalesOrderHeader soh
+            LEFT JOIN Sales.Customer c ON soh.CustomerID = c.CustomerID
+            LEFT JOIN Person.Person p ON c.PersonID = p.BusinessEntityID
+            LEFT JOIN Sales.Store s ON c.StoreID = s.BusinessEntityID
+            LEFT JOIN Sales.SalesPerson sp ON soh.SalesPersonID = sp.BusinessEntityID
+            LEFT JOIN Person.Person per ON sp.BusinessEntityID = per.BusinessEntityID
+            LEFT JOIN Purchasing.ShipMethod sm ON soh.ShipMethodID = sm.ShipMethodID
+            LEFT JOIN OrderApprovals oa ON soh.SalesOrderID = oa.SalesOrderID
 
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(query, connection))
+            UNION ALL
+
+            -- PURCHASE ORDERS (no DueDate column, we fake it)
+            SELECT 
+                poh.PurchaseOrderID AS [Order ID],
+                poh.OrderDate AS [Order Date],
+                DATEADD(DAY, 7, poh.OrderDate) AS [Due Date],
+                v.Name AS [Customer/Vendor],
+                'Employee ID: ' + CAST(poh.EmployeeID AS varchar) AS [Employee],
+                sm.Name AS [Ship Method],
+                poh.SubTotal + poh.TaxAmt AS [Total],
+                'Purchase' AS [Order Type],
+                CASE 
+                    WHEN poh.Status = 2 THEN 'Approved'
+                    WHEN poh.Status = 3 THEN 'Rejected'
+                    ELSE 'Pending'
+                END AS [Approval Status]
+            FROM Purchasing.PurchaseOrderHeader poh
+            LEFT JOIN Purchasing.Vendor v ON poh.VendorID = v.BusinessEntityID
+            LEFT JOIN Purchasing.ShipMethod sm ON poh.ShipMethodID = sm.ShipMethodID
+
+            ORDER BY [Order Date] DESC;";
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(combinedQuery, connection))
                     {
-                        DataTable dataTable = new DataTable();
-                        adapter.Fill(dataTable);
-                        dataGridViewOrderHistory.DataSource = dataTable;
-                        ApplyApprovalStatusColors(); 
+                        DataTable combinedTable = new DataTable();
+                        adapter.Fill(combinedTable);
+                        dataGridViewOrderHistory.DataSource = combinedTable;
+                        ApplyApprovalStatusColors();
                     }
                 }
                 catch (Exception ex)
@@ -230,6 +239,8 @@ namespace SokProodos
                 }
             }
         }
+
+
 
 
 

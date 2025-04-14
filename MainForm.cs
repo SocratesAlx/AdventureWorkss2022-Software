@@ -18,7 +18,7 @@ namespace SokProodos
 {
     public partial class MainForm : Form
     {
-
+        private System.Windows.Forms.DataGridView DataGridViewPurchaseOrders;
         private Chart chartOrders;
         private Chart chartTopProducts;
         private Chart chartSalesCategories;
@@ -34,23 +34,48 @@ namespace SokProodos
             LoadDashboardInfo();
             CreateStyledSideMenu();
             CreateRightActionButtons();
-            LoadOpenOrders(); // Anoigeis ta orders kateutheian
+            LoadOpenOrders();
+            DataGridViewPurchaseOrders = new DataGridView
+            {
+                Name = "DataGridViewPurchaseOrders",
+                Size = new Size(900, 250),
+                Location = new Point(20, 120),
+                BackgroundColor = Color.White,
+                AllowUserToAddRows = false,
+                AllowUserToDeleteRows = false,
+                ReadOnly = true,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill,
+                BorderStyle = BorderStyle.None
+            };
+            DataGridViewPurchaseOrders.CellClick += DataGridViewPurchaseOrders_CellClick;
+            DataGridViewPurchaseOrders.CellPainting += dataGridViewOpenOrders_CellPainting;
+
+            panelInfo.Controls.Add(DataGridViewPurchaseOrders);
+
+            LoadPurchaseOrders(); // 👈 ADD THIS LINE
+
+            DataGridViewPurchaseOrders.CellClick += DataGridViewPurchaseOrders_CellClick;
             this.StartPosition = FormStartPosition.CenterScreen;
             UIStyler.StyleButtonsInForm(this);
+
             slideTimer = new Timer();
             slideTimer.Interval = 10;
             slideTimer.Tick += SlidePanel_Tick;
+
             dataGridViewOpenOrders.CellClick += dataGridViewOpenOrders_CellClick;
-            dataGridViewOpenOrders.CellPainting += dataGridViewOpenOrders_CellPainting;
+            dataGridViewOpenOrders.CellPainting += dataGridViewOpenOrders_CellPainting;          
 
-
-
-
+            panelInfo.Controls.Add(DataGridViewPurchaseOrders);
+            panelInfo.BringToFront();
 
             panelInfo.Visible = false;
+
             panelInfo.BackColor = Color.FromArgb(0, 122, 204);
             panelInfo.Padding = new Padding(10);
             panelInfo.BorderStyle = BorderStyle.None;
+            panelInfo.Size = new Size(950, 400);
+
+
             int y = 10;
             foreach (Control ctrl in panelInfo.Controls)
             {
@@ -63,21 +88,18 @@ namespace SokProodos
                     y += lbl.Height + 10;
                 }
             }
-           
-
 
             Label labelCurrentUser = new Label
             {
                 Name = "labelCurrentUser",
                 Text = "👤 Current User: Loading...",
-                Font = new Font("Segoe UI", 9, FontStyle.Regular), 
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
                 ForeColor = Color.White,
                 Location = new Point(20, 20),
                 AutoSize = true
             };
             this.Controls.Add(labelCurrentUser);
 
-            
             Label labelDateTime = new Label
             {
                 Name = "labelDateTime",
@@ -88,14 +110,12 @@ namespace SokProodos
                 AutoSize = true
             };
             this.Controls.Add(labelDateTime);
-            
+
             dateTimeTimer = new Timer();
-            dateTimeTimer.Interval = 1000; 
+            dateTimeTimer.Interval = 1000;
             dateTimeTimer.Tick += DateTimeTimer_Tick;
             dateTimeTimer.Start();
 
-
-            
             Label labelTotalOrders = new Label
             {
                 Name = "labelTotalOrders",
@@ -111,26 +131,25 @@ namespace SokProodos
             labelAboutUs.Font = new Font("Segoe UI", 9, FontStyle.Underline);
             labelAboutUs.ForeColor = Color.LightBlue;
             labelAboutUs.Cursor = Cursors.Hand;
-            labelAboutUs.BackColor = Color.Transparent; 
-
+            labelAboutUs.BackColor = Color.Transparent;
             labelAboutUs.Click += (s, e) =>
             {
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
                 {
-                    FileName = "https://www.adventure-works.com", 
+                    FileName = "https://www.adventure-works.com",
                     UseShellExecute = true
                 });
             };
-
             labelAboutUs.MouseEnter += (s, e) => labelAboutUs.ForeColor = Color.DeepSkyBlue;
             labelAboutUs.MouseLeave += (s, e) => labelAboutUs.ForeColor = Color.LightBlue;
             labelAboutUs.BringToFront();
 
-            // info button starts clicked
             this.Shown += (s, e) => buttonToggleInfo_Click(buttonToggleInfo, EventArgs.Empty);
+        }
+
             
 
-        }
+        
         private void LoadCurrentUser()
         {
             if (!string.IsNullOrEmpty(GlobalSession.LoggedInUser))
@@ -267,7 +286,7 @@ namespace SokProodos
 
         private void SlidePanel_Tick(object sender, EventArgs e)
         {
-            int targetHeight = slidingDown ? 175 : 0;
+            int targetHeight = slidingDown ? 400 : 0;
             int step = 10;
 
             if (slidingDown)
@@ -579,11 +598,12 @@ namespace SokProodos
                 {
                     conn.Open();
                     string query = @"
-                SELECT SalesOrderID, 
+                SELECT SalesOrderID AS OrderID, 
+                       'Sales' AS OrderType,
                        CONVERT(VARCHAR(10), OrderDate, 120) AS OrderDate, 
                        CAST(TotalDue AS decimal(10,2)) AS TotalDue
                 FROM Sales.SalesOrderHeader
-                WHERE Status = 1"; // 1 = se process
+                WHERE Status = 1";
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
                     {
@@ -592,13 +612,13 @@ namespace SokProodos
 
                         dataGridViewOpenOrders.DataSource = dt;
 
-                        
+                        // Remove old buttons if exist
                         if (dataGridViewOpenOrders.Columns.Contains("Approve"))
                             dataGridViewOpenOrders.Columns.Remove("Approve");
                         if (dataGridViewOpenOrders.Columns.Contains("Reject"))
                             dataGridViewOpenOrders.Columns.Remove("Reject");
 
-                        
+                        // Add Approve Button
                         DataGridViewButtonColumn approveButton = new DataGridViewButtonColumn
                         {
                             Name = "Approve",
@@ -609,7 +629,7 @@ namespace SokProodos
                         };
                         dataGridViewOpenOrders.Columns.Add(approveButton);
 
-                        
+                        // Add Reject Button
                         DataGridViewButtonColumn rejectButton = new DataGridViewButtonColumn
                         {
                             Name = "Reject",
@@ -619,63 +639,6 @@ namespace SokProodos
                             FlatStyle = FlatStyle.Flat
                         };
                         dataGridViewOpenOrders.Columns.Add(rejectButton);
-
-                        // Style
-                        Color bgColor = Color.FromArgb(0, 122, 204);
-
-                        dataGridViewOpenOrders.BackgroundColor = bgColor;
-                        dataGridViewOpenOrders.BorderStyle = BorderStyle.FixedSingle;
-                        dataGridViewOpenOrders.GridColor = Color.White;
-                        dataGridViewOpenOrders.EnableHeadersVisualStyles = false;
-                        dataGridViewOpenOrders.RowHeadersVisible = false;
-
-                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(0, 160, 180);
-                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.ForeColor = Color.White;
-                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
-
-                        dataGridViewOpenOrders.DefaultCellStyle.BackColor = bgColor;
-                        dataGridViewOpenOrders.DefaultCellStyle.ForeColor = Color.White;
-                        dataGridViewOpenOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 160, 180);
-                        dataGridViewOpenOrders.DefaultCellStyle.SelectionForeColor = Color.White;
-                        dataGridViewOpenOrders.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
-                        dataGridViewOpenOrders.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-
-                        
-                       
-                        dataGridViewOpenOrders.BringToFront();
-
-                        
-                        dataGridViewOpenOrders.CellBorderStyle = DataGridViewCellBorderStyle.None;
-                        dataGridViewOpenOrders.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-                        dataGridViewOpenOrders.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
-
-                        dataGridViewOpenOrders.GridColor = dataGridViewOpenOrders.BackgroundColor; // same color to hide lines
-
-                        
-                        dataGridViewOpenOrders.ColumnHeadersHeight = 36;
-                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.Padding = new Padding(0, 6, 0, 6);
-                        dataGridViewOpenOrders.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
-                       
-                        dataGridViewOpenOrders.DefaultCellStyle.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
-                        dataGridViewOpenOrders.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
-
-                        
-                        dataGridViewOpenOrders.RowTemplate.Height = 30;
-                        dataGridViewOpenOrders.DefaultCellStyle.Padding = new Padding(0, 4, 0, 4);
-
-                        
-                        dataGridViewOpenOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 160, 180);
-                        dataGridViewOpenOrders.DefaultCellStyle.SelectionForeColor = Color.White;
-                        dataGridViewOpenOrders.DefaultCellStyle.SelectionBackColor = Color.FromArgb(0, 160, 180);
-                        dataGridViewOpenOrders.DefaultCellStyle.SelectionForeColor = Color.White;
-
-                        
-                        dataGridViewOpenOrders.ScrollBars = ScrollBars.Vertical;
-
-
-                        
                     }
                 }
             }
@@ -686,44 +649,54 @@ namespace SokProodos
         }
 
 
+
+
         private void dataGridViewOpenOrders_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
             {
                 string columnName = dataGridViewOpenOrders.Columns[e.ColumnIndex].Name;
+                DataGridViewRow row = dataGridViewOpenOrders.Rows[e.RowIndex];
 
-                
-                string orderId = dataGridViewOpenOrders.Rows[e.RowIndex].Cells["SalesOrderID"].Value.ToString();
+                string orderId = row.Cells["OrderID"].Value.ToString();
+                string orderType = row.Cells["OrderType"].Value.ToString();
 
                 if (columnName == "Approve")
                 {
-                    DialogResult result = MessageBox.Show($"Approve order #{orderId}?", "Confirm Approval", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                    DialogResult result = MessageBox.Show($"Approve {orderType} order #{orderId}?", "Confirm Approval", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (result == DialogResult.Yes)
                     {
-                        UpdateOrderStatus(orderId, 5); // 5 = Approved
+                        UpdateOrderStatus(orderId, 5, orderType);
                     }
                 }
                 else if (columnName == "Reject")
                 {
-                    DialogResult result = MessageBox.Show($"Reject order #{orderId}?", "Confirm Rejection", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    DialogResult result = MessageBox.Show($"Reject {orderType} order #{orderId}?", "Confirm Rejection", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                     if (result == DialogResult.Yes)
                     {
-                        UpdateOrderStatus(orderId, 6); // 6 = Rejected
+                        UpdateOrderStatus(orderId, 6, orderType);
                     }
                 }
             }
         }
 
 
-        private void UpdateOrderStatus(string orderId, int newStatus)
+
+        private void UpdateOrderStatus(string orderId, int newStatus, string orderType)
         {
             try
             {
+                if (orderType != "Sales")
+                {
+                    MessageBox.Show("Only sales orders can be approved or rejected from this interface.");
+                    return;
+                }
+
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
 
-                    // Update Sales.SalesOrderHeader (status field)
+                    // Update Status in Sales.SalesOrderHeader
                     string updateHeader = "UPDATE Sales.SalesOrderHeader SET Status = @status WHERE SalesOrderID = @id";
                     using (SqlCommand cmd = new SqlCommand(updateHeader, conn))
                     {
@@ -747,7 +720,7 @@ namespace SokProodos
                         cmd.ExecuteNonQuery();
                     }
 
-                    MessageBox.Show("Order updated successfully!");
+                    MessageBox.Show("Sales order updated successfully!");
                     LoadOpenOrders();
                 }
             }
@@ -756,6 +729,8 @@ namespace SokProodos
                 MessageBox.Show("Error updating order: " + ex.Message);
             }
         }
+
+
 
 
 
@@ -1002,6 +977,160 @@ namespace SokProodos
             }
         }
 
+        private void DataGridViewPurchaseOrders_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return;
+
+            var grid = sender as DataGridView;
+            if (grid == null)
+                return;
+
+            string columnName = grid.Columns[e.ColumnIndex].Name;
+            if (columnName != "Approve" && columnName != "Reject")
+                return;
+
+            var row = grid.Rows[e.RowIndex];
+            string purchaseOrderId = row.Cells["PurchaseOrderID"].Value.ToString();
+            int newStatus = columnName == "Approve" ? 2 : 3;
+            string action = columnName == "Approve" ? "approve" : "reject";
+
+            DialogResult result = MessageBox.Show(
+                $"Are you sure you want to {action} purchase order #{purchaseOrderId}?",
+                "Confirm Action",
+                MessageBoxButtons.YesNo,
+                columnName == "Approve" ? MessageBoxIcon.Question : MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                UpdatePurchaseOrderStatus(purchaseOrderId, newStatus);
+            }
+        }
+
+
+        private void LoadPurchaseOrders()
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                SELECT 
+                    PO.PurchaseOrderID, 
+                    V.Name AS Vendor, 
+                    E.JobTitle AS Employee,
+                    SM.Name AS ShipMethod,
+                    CONVERT(VARCHAR(10), PO.OrderDate, 120) AS OrderDate, 
+                    CONVERT(VARCHAR(10), PO.ShipDate, 120) AS ShipDate,
+                    CAST(PO.SubTotal + PO.TaxAmt AS decimal(10,2)) AS Total,
+                    CASE PO.Status
+                        WHEN 1 THEN 'Pending'
+                        WHEN 2 THEN 'Approved'
+                        WHEN 3 THEN 'Rejected'
+                        ELSE 'Unknown'
+                    END AS Status
+                FROM Purchasing.PurchaseOrderHeader PO
+                JOIN Purchasing.Vendor V ON PO.VendorID = V.BusinessEntityID
+                JOIN HumanResources.Employee E ON PO.EmployeeID = E.BusinessEntityID
+                JOIN Purchasing.ShipMethod SM ON PO.ShipMethodID = SM.ShipMethodID
+                WHERE PO.Status = 1";
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
+                    {
+                        DataTable dt = new DataTable();
+                        adapter.Fill(dt);
+
+                        // Find your designer-created grid
+                        if (DataGridViewPurchaseOrders == null)
+                            DataGridViewPurchaseOrders = this.Controls.Find("dataGridViewPurchaseOrders", true).FirstOrDefault() as DataGridView;
+
+                        if (DataGridViewPurchaseOrders == null)
+                        {
+                            MessageBox.Show("dataGridViewPurchaseOrders not found.");
+                            return;
+                        }
+
+                        DataGridViewPurchaseOrders.DataSource = dt;
+
+                        // Remove buttons if already added
+                        if (DataGridViewPurchaseOrders.Columns.Contains("Approve"))
+                            DataGridViewPurchaseOrders.Columns.Remove("Approve");
+                        if (DataGridViewPurchaseOrders.Columns.Contains("Reject"))
+                            DataGridViewPurchaseOrders.Columns.Remove("Reject");
+
+                        // Add Approve
+                        DataGridViewButtonColumn approveButton = new DataGridViewButtonColumn
+                        {
+                            Name = "Approve",
+                            HeaderText = "👍",
+                            Text = "👍",
+                            UseColumnTextForButtonValue = true,
+                            FlatStyle = FlatStyle.Flat
+                        };
+                        DataGridViewPurchaseOrders.Columns.Add(approveButton);
+
+                        // Add Reject
+                        DataGridViewButtonColumn rejectButton = new DataGridViewButtonColumn
+                        {
+                            Name = "Reject",
+                            HeaderText = "👎",
+                            Text = "👎",
+                            UseColumnTextForButtonValue = true,
+                            FlatStyle = FlatStyle.Flat
+                        };
+                        DataGridViewPurchaseOrders.Columns.Add(rejectButton);
+
+                        // 🔥 Align perfectly with Sales grid
+                        DataGridViewPurchaseOrders.Width = dataGridViewOpenOrders.Width;
+                        DataGridViewPurchaseOrders.Height = dataGridViewOpenOrders.Height;
+
+                        DataGridViewPurchaseOrders.Location = new Point(
+                            dataGridViewOpenOrders.Location.X,
+                            dataGridViewOpenOrders.Location.Y + dataGridViewOpenOrders.Height + 10
+                        );
+
+                        DataGridViewPurchaseOrders.BringToFront();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading purchase orders: " + ex.Message);
+            }
+        }
+
+
+
+        private void UpdatePurchaseOrderStatus(string purchaseOrderId, int newStatus)
+        {
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                UPDATE Purchasing.PurchaseOrderHeader
+                SET Status = @status
+                WHERE PurchaseOrderID = @id";
+
+                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@status", newStatus);
+                        cmd.Parameters.AddWithValue("@id", purchaseOrderId);
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show("Purchase order updated successfully!");
+                    LoadPurchaseOrders(); // Refresh after update
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error updating purchase order: " + ex.Message);
+            }
+        }
 
 
 
@@ -1112,7 +1241,11 @@ namespace SokProodos
 
         private void dataGridViewOpenOrders_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
-            if (e.RowIndex < 0) return; // skip headers
+            if (e.RowIndex < 0 || e.ColumnIndex < 0)
+                return; // Skip headers and invalid indices
+
+            if (e.ColumnIndex >= dataGridViewOpenOrders.Columns.Count)
+                return; // Safety check to avoid out of range
 
             string columnName = dataGridViewOpenOrders.Columns[e.ColumnIndex].Name;
 
@@ -1143,6 +1276,7 @@ namespace SokProodos
         }
 
 
+
         private void Button_MouseEnter(object sender, EventArgs e)
         {
             ((Button)sender).BackColor = Color.FromArgb(114, 137, 218); 
@@ -1154,7 +1288,7 @@ namespace SokProodos
         }
 
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)  
         {
             CustomerForm CustomerForm = new CustomerForm();
             CustomerForm.Show();
@@ -1315,7 +1449,10 @@ namespace SokProodos
             }
         }
 
-     
+        private void dataGridViewPurchaseOrders_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
     }
     public static class ChartExtensions
     {

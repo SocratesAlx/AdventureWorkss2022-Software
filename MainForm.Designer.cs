@@ -38,8 +38,8 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.panelInfo = new System.Windows.Forms.Panel();
-            this.buttonToggleInfo = new System.Windows.Forms.Button();
             this.dataGridViewOpenOrders = new System.Windows.Forms.DataGridView();
+            this.buttonToggleInfo = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.panelInfo.SuspendLayout();
@@ -134,7 +134,7 @@
             // pictureBox3
             // 
             this.pictureBox3.Image = global::SokProodos.Properties.Resources.pngwing_com__17_;
-            this.pictureBox3.Location = new System.Drawing.Point(293, 688);
+            this.pictureBox3.Location = new System.Drawing.Point(264, 693);
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.Size = new System.Drawing.Size(1095, 235);
             this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -150,8 +150,16 @@
             this.panelInfo.Controls.Add(this.labelTotalOrders);
             this.panelInfo.Location = new System.Drawing.Point(215, 34);
             this.panelInfo.Name = "panelInfo";
-            this.panelInfo.Size = new System.Drawing.Size(875, 186);
+            this.panelInfo.Size = new System.Drawing.Size(875, 433);
             this.panelInfo.TabIndex = 29;
+            // 
+            // dataGridViewOpenOrders
+            // 
+            this.dataGridViewOpenOrders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridViewOpenOrders.Location = new System.Drawing.Point(306, 13);
+            this.dataGridViewOpenOrders.Name = "dataGridViewOpenOrders";
+            this.dataGridViewOpenOrders.Size = new System.Drawing.Size(566, 177);
+            this.dataGridViewOpenOrders.TabIndex = 0;
             // 
             // buttonToggleInfo
             // 
@@ -163,23 +171,15 @@
             this.buttonToggleInfo.UseVisualStyleBackColor = true;
             this.buttonToggleInfo.Click += new System.EventHandler(this.buttonToggleInfo_Click);
             // 
-            // dataGridViewOpenOrders
-            // 
-            this.dataGridViewOpenOrders.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridViewOpenOrders.Location = new System.Drawing.Point(322, 13);
-            this.dataGridViewOpenOrders.Name = "dataGridViewOpenOrders";
-            this.dataGridViewOpenOrders.Size = new System.Drawing.Size(542, 150);
-            this.dataGridViewOpenOrders.TabIndex = 0;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ClientSize = new System.Drawing.Size(1269, 823);
+            this.Controls.Add(this.panelInfo);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.buttonToggleInfo);
-            this.Controls.Add(this.panelInfo);
             this.Controls.Add(this.labelAboutUs);
             this.Controls.Add(this.buttonLogOut);
             this.Controls.Add(this.labelDateTime);

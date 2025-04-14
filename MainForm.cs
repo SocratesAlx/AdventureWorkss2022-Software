@@ -144,7 +144,7 @@ namespace SokProodos
             labelAboutUs.MouseLeave += (s, e) => labelAboutUs.ForeColor = Color.LightBlue;
             labelAboutUs.BringToFront();
 
-            this.Shown += (s, e) => buttonToggleInfo_Click(buttonToggleInfo, EventArgs.Empty);
+            
         }
 
             
@@ -472,7 +472,7 @@ namespace SokProodos
                 startY += buttonHeight + spacing;
             }
 
-            
+            AddStyledButton("🛒 Create Purchase Order", buttonCreatePurchaseOrder_Click);
             AddStyledButton("Create Sale Order", button7_Click);
             AddStyledButton("Order History", button6_Click);
             AddStyledButton("Stock History", button8_Click);
@@ -1101,6 +1101,12 @@ namespace SokProodos
             }
         }
 
+        private void buttonCreatePurchaseOrder_Click(object sender, EventArgs e)
+        {
+            ReorderProductsForm ReorderProductsFor = new ReorderProductsForm();
+            ReorderProductsFor.Show();
+            this.Hide();
+        }
 
 
         private void UpdatePurchaseOrderStatus(string purchaseOrderId, int newStatus)

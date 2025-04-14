@@ -165,9 +165,9 @@
             // 
             this.buttonToggleInfo.Location = new System.Drawing.Point(215, 0);
             this.buttonToggleInfo.Name = "buttonToggleInfo";
-            this.buttonToggleInfo.Size = new System.Drawing.Size(83, 28);
+            this.buttonToggleInfo.Size = new System.Drawing.Size(98, 28);
             this.buttonToggleInfo.TabIndex = 30;
-            this.buttonToggleInfo.Text = "Info";
+            this.buttonToggleInfo.Text = "ℹ️ Show Info";
             this.buttonToggleInfo.UseVisualStyleBackColor = true;
             this.buttonToggleInfo.Click += new System.EventHandler(this.buttonToggleInfo_Click);
             // 

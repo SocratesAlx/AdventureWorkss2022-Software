@@ -40,6 +40,7 @@
             this.panelInfo = new System.Windows.Forms.Panel();
             this.dataGridViewOpenOrders = new System.Windows.Forms.DataGridView();
             this.buttonToggleInfo = new System.Windows.Forms.Button();
+            this.buttonOrderStatus = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.panelInfo.SuspendLayout();
@@ -150,7 +151,7 @@
             this.panelInfo.Controls.Add(this.labelTotalOrders);
             this.panelInfo.Location = new System.Drawing.Point(215, 34);
             this.panelInfo.Name = "panelInfo";
-            this.panelInfo.Size = new System.Drawing.Size(875, 433);
+            this.panelInfo.Size = new System.Drawing.Size(304, 178);
             this.panelInfo.TabIndex = 29;
             // 
             // dataGridViewOpenOrders
@@ -171,12 +172,23 @@
             this.buttonToggleInfo.UseVisualStyleBackColor = true;
             this.buttonToggleInfo.Click += new System.EventHandler(this.buttonToggleInfo_Click);
             // 
+            // buttonOrderStatus
+            // 
+            this.buttonOrderStatus.Location = new System.Drawing.Point(320, 0);
+            this.buttonOrderStatus.Name = "buttonOrderStatus";
+            this.buttonOrderStatus.Size = new System.Drawing.Size(102, 27);
+            this.buttonOrderStatus.TabIndex = 31;
+            this.buttonOrderStatus.Text = "Orders";
+            this.buttonOrderStatus.UseVisualStyleBackColor = true;
+            this.buttonOrderStatus.Click += new System.EventHandler(this.buttonOrderStatus_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
             this.ClientSize = new System.Drawing.Size(1269, 823);
+            this.Controls.Add(this.buttonOrderStatus);
             this.Controls.Add(this.panelInfo);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.buttonToggleInfo);
@@ -209,5 +221,6 @@
         private System.Windows.Forms.Panel panelInfo;
         private System.Windows.Forms.Button buttonToggleInfo;
         private System.Windows.Forms.DataGridView dataGridViewOpenOrders;
+        private System.Windows.Forms.Button buttonOrderStatus;
     }
 }

@@ -54,6 +54,8 @@ namespace SokProodos
 
             LoadPurchaseOrders(); // 👈 ADD THIS LINE
 
+
+
             DataGridViewPurchaseOrders.CellClick += DataGridViewPurchaseOrders_CellClick;
             this.StartPosition = FormStartPosition.CenterScreen;
             UIStyler.StyleButtonsInForm(this);
@@ -63,7 +65,7 @@ namespace SokProodos
             slideTimer.Tick += SlidePanel_Tick;
 
             dataGridViewOpenOrders.CellClick += dataGridViewOpenOrders_CellClick;
-            dataGridViewOpenOrders.CellPainting += dataGridViewOpenOrders_CellPainting;          
+            dataGridViewOpenOrders.CellPainting += dataGridViewOpenOrders_CellPainting;
 
             panelInfo.Controls.Add(DataGridViewPurchaseOrders);
             panelInfo.BringToFront();
@@ -73,7 +75,7 @@ namespace SokProodos
             panelInfo.BackColor = Color.FromArgb(0, 122, 204);
             panelInfo.Padding = new Padding(10);
             panelInfo.BorderStyle = BorderStyle.None;
-            panelInfo.Size = new Size(950, 400);
+            panelInfo.Size = new Size(305, 400);
 
 
             int y = 10;
@@ -144,12 +146,52 @@ namespace SokProodos
             labelAboutUs.MouseLeave += (s, e) => labelAboutUs.ForeColor = Color.LightBlue;
             labelAboutUs.BringToFront();
 
-            
+            slideOrderStatusTimer = new Timer();
+            slideOrderStatusTimer.Interval = 10;
+            slideOrderStatusTimer.Tick += SlideOrderStatusTimer_Tick;
+
         }
 
-            
+        private Panel panelOrderStatus;
+        private Timer slideOrderStatusTimer;
+        private bool slidingOrderStatusDown = true;
 
-        
+
+        private void SlideOrderStatusTimer_Tick(object sender, EventArgs e)
+        {
+            int targetHeight = slidingOrderStatusDown ? 250 : 0;
+            int step = 10;
+
+            if (slidingOrderStatusDown)
+            {
+                panelOrderStatus.Height = Math.Min(panelOrderStatus.Height + step, targetHeight);
+
+                if (panelOrderStatus.Height >= 30)
+                {
+                    using (GraphicsPath path = GraphicsExtensions.CreateRoundedRect(panelOrderStatus.ClientRectangle, 12))
+                    {
+                        panelOrderStatus.Region = new Region(path);
+                    }
+                }
+
+                if (panelOrderStatus.Height >= targetHeight)
+                {
+                    slideOrderStatusTimer.Stop();
+                }
+            }
+            else
+            {
+                panelOrderStatus.Height = Math.Max(panelOrderStatus.Height - step, targetHeight);
+                if (panelOrderStatus.Height <= 0)
+                {
+                    panelOrderStatus.Visible = false;
+                    slideOrderStatusTimer.Stop();
+                }
+            }
+        }
+
+
+
         private void LoadCurrentUser()
         {
             if (!string.IsNullOrEmpty(GlobalSession.LoggedInUser))
@@ -286,14 +328,14 @@ namespace SokProodos
 
         private void SlidePanel_Tick(object sender, EventArgs e)
         {
-            int targetHeight = slidingDown ? 400 : 0;
+            int targetHeight = slidingDown ? 120 : 0;
             int step = 10;
 
             if (slidingDown)
             {
                 panelInfo.Height = Math.Min(panelInfo.Height + step, targetHeight);
 
-               
+
                 if (panelInfo.Height >= 30)
                 {
                     using (GraphicsPath path = GraphicsExtensions.CreateRoundedRect(panelInfo.ClientRectangle, 12))
@@ -462,13 +504,13 @@ namespace SokProodos
 
                 btn.Click += onClick;
 
-                
+
                 this.Controls.Add(btn);
 
                 // bring to front giati to blockarei to chart gtxm
                 btn.BringToFront();
 
-                
+
                 startY += buttonHeight + spacing;
             }
 
@@ -494,7 +536,7 @@ namespace SokProodos
             };
             this.Controls.Add(panelDashboard);
 
-            
+
             Label lblDashboard = new Label
             {
                 Text = "📊 Business Dashboard",
@@ -505,7 +547,7 @@ namespace SokProodos
             };
             panelDashboard.Controls.Add(lblDashboard);
 
-            
+
             ComboBox comboBoxFilter = new ComboBox
             {
                 Name = "comboBoxFilter",
@@ -557,7 +599,7 @@ namespace SokProodos
                 Text = $"Stock - {timeRangeText}",
                 Font = new Font("Arial", 10, FontStyle.Bold),
                 ForeColor = Color.Black,
-                Location = new Point(480, 80), 
+                Location = new Point(480, 80),
                 AutoSize = true
             };
             panelDashboard.Controls.Add(lblStock);
@@ -567,7 +609,7 @@ namespace SokProodos
             chartStock.Series["Stock"]["PieLabelStyle"] = "Disabled";
             chartStock.Legends[0].Enabled = true;
             chartStock.Legends[0].Docking = Docking.Bottom;
-            chartStock.Location = new Point(480, 100); 
+            chartStock.Location = new Point(480, 100);
             chartStock.Size = new Size(450, 200);
             panelDashboard.Controls.Add(chartStock);
 
@@ -764,12 +806,12 @@ namespace SokProodos
                     break;
             }
 
-            
+
             LoadOrderChart(fromDate);
             LoadTopProductsChart(fromDate);
             LoadStockChart(fromDate);
 
-            
+
             Control panel = this.Controls.Find("panelDashboard", true).FirstOrDefault();
             if (panel != null)
             {
@@ -883,7 +925,7 @@ namespace SokProodos
                 BorderlineWidth = 1
             };
 
-            
+
             ChartArea area = new ChartArea("MainArea")
             {
                 BackColor = Color.White
@@ -947,10 +989,10 @@ namespace SokProodos
             {
                 DataPoint point = hit.Series.Points[hit.PointIndex];
 
-                
+
                 if (point.Tag == null)
                 {
-                    point.Tag = point.Color; 
+                    point.Tag = point.Color;
                     point.Color = ControlPaint.Light(point.Color);
                     point.MarkerSize = 10;
                 }
@@ -1207,7 +1249,7 @@ namespace SokProodos
             }
         }
 
-        
+
         private void LoadTopProductsChart()
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -1233,14 +1275,14 @@ namespace SokProodos
                         chart.Series["TopProducts"].Points.AddXY(productName, totalSold);
                     }
 
-                    
-                    chart.Series["TopProducts"]["PixelPointWidth"] = "10";  
-                    chart.Series["TopProducts"]["PointWidth"] = "0.4";      
 
-                    
-                    chart.ChartAreas[0].AxisX.LabelStyle.Angle = 0;  
-                    chart.ChartAreas[0].AxisX.LabelStyle.Font = new Font("Arial", 9, FontStyle.Bold);  
-                    chart.ChartAreas[0].AxisY.LabelStyle.Font = new Font("Arial", 9, FontStyle.Bold);  
+                    chart.Series["TopProducts"]["PixelPointWidth"] = "10";
+                    chart.Series["TopProducts"]["PointWidth"] = "0.4";
+
+
+                    chart.ChartAreas[0].AxisX.LabelStyle.Angle = 0;
+                    chart.ChartAreas[0].AxisX.LabelStyle.Font = new Font("Arial", 9, FontStyle.Bold);
+                    chart.ChartAreas[0].AxisY.LabelStyle.Font = new Font("Arial", 9, FontStyle.Bold);
                 }
             }
         }
@@ -1285,16 +1327,16 @@ namespace SokProodos
 
         private void Button_MouseEnter(object sender, EventArgs e)
         {
-            ((Button)sender).BackColor = Color.FromArgb(114, 137, 218); 
+            ((Button)sender).BackColor = Color.FromArgb(114, 137, 218);
         }
 
         private void Button_MouseLeave(object sender, EventArgs e)
         {
-            ((Button)sender).BackColor = Color.FromArgb(88, 101, 242); 
+            ((Button)sender).BackColor = Color.FromArgb(88, 101, 242);
         }
 
 
-        private void button1_Click(object sender, EventArgs e)  
+        private void button1_Click(object sender, EventArgs e)
         {
             CustomerForm CustomerForm = new CustomerForm();
             CustomerForm.Show();
@@ -1330,7 +1372,7 @@ namespace SokProodos
             this.Hide();
         }
 
-        
+
 
         private void button5_Click(object sender, EventArgs e)
         {
@@ -1434,7 +1476,7 @@ namespace SokProodos
 
         private void labelReorderProducts_Click(object sender, EventArgs e)
         {
-           
+
         }
 
         private void buttonToggleInfo_Click(object sender, EventArgs e)
@@ -1458,6 +1500,65 @@ namespace SokProodos
         private void dataGridViewPurchaseOrders_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
+        }
+
+        private void buttonOrderStatus_Click(object sender, EventArgs e)
+        {
+            Button btn = sender as Button;
+            if (btn == null) return;
+
+            if (panelOrderStatus == null)
+            {
+                int gridWidth = 430;
+                int gridHeight = 210;
+                int spacing = 10;
+
+                panelOrderStatus = new Panel
+                {
+                    Name = "panelOrderStatus",
+                    Size = new Size(gridWidth * 2 + spacing + 20, 0), // ✅ Ακριβώς όσο χρειάζεται
+                    BackColor = Color.FromArgb(30, 30, 60),
+                    Padding = new Padding(10),
+                    BorderStyle = BorderStyle.None,
+                    Visible = false
+                };
+
+                // ✅ Τοποθέτηση κάτω από το κουμπί
+                int x = btn.Left;
+                int y = btn.Bottom + 5;
+                panelOrderStatus.Location = new Point(x, y);
+
+                // ✅ Ευθυγράμμιση και μέγεθος grids
+                dataGridViewOpenOrders.Width = gridWidth;
+                dataGridViewOpenOrders.Height = gridHeight;
+                dataGridViewOpenOrders.Location = new Point(10, 10);
+
+                DataGridViewPurchaseOrders.Width = gridWidth;
+                DataGridViewPurchaseOrders.Height = gridHeight;
+                DataGridViewPurchaseOrders.Location = new Point(10 + gridWidth + spacing, 10);
+
+                panelOrderStatus.Controls.Add(dataGridViewOpenOrders);
+                panelOrderStatus.Controls.Add(DataGridViewPurchaseOrders);
+                this.Controls.Add(panelOrderStatus);
+                panelOrderStatus.BringToFront();
+            }
+
+            if (!panelOrderStatus.Visible)
+            {
+                panelOrderStatus.Visible = true;
+                panelOrderStatus.Height = 0;
+                slidingOrderStatusDown = true;
+                slideOrderStatusTimer.Start();
+                buttonOrderStatus.Text = "❌ Hide Orders";
+            }
+            else
+            {
+                slidingOrderStatusDown = false;
+                slideOrderStatusTimer.Start();
+                buttonOrderStatus.Text = "📋 Order Status";
+            }
+
+            panelOrderStatus.BringToFront();
         }
     }
     public static class ChartExtensions

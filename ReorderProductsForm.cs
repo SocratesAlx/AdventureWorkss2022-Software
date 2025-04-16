@@ -133,27 +133,26 @@ namespace SokProodos
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 StringBuilder query = new StringBuilder(@"
-            SELECT 
-                p.ProductID,
-                p.Name,
-                pi.Quantity,
-                p.ReorderPoint,
-                p.SafetyStockLevel,
-                p.MakeFlag,
-                pi.ModifiedDate
-            FROM 
-                Production.Product p
-            JOIN 
-                Production.ProductInventory pi ON p.ProductID = pi.ProductID
-            WHERE 
-                pi.Quantity < p.ReorderPoint
+        SELECT 
+            p.ProductID,
+            p.Name,
+            ISNULL(pi.Quantity, 0) AS Quantity,
+            p.ReorderPoint,
+            p.SafetyStockLevel,
+            p.MakeFlag,
+            ISNULL(pi.ModifiedDate, p.ModifiedDate) AS ModifiedDate
+        FROM 
+            Production.Product p
+        LEFT JOIN 
+            Production.ProductInventory pi ON p.ProductID = pi.ProductID
+        WHERE 1=1
         ");
 
                 if (filterMakeFlag)
                     query.Append(" AND p.MakeFlag = 1");
 
                 if (filterRecent)
-                    query.Append(" AND pi.ModifiedDate >= DATEADD(DAY, -30, GETDATE())");
+                    query.Append(" AND ISNULL(pi.ModifiedDate, p.ModifiedDate) >= DATEADD(DAY, -30, GETDATE())");
 
                 using (SqlCommand cmd = new SqlCommand(query.ToString(), conn))
                 using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
@@ -175,17 +174,19 @@ namespace SokProodos
                 row["Select"] = false;
             }
 
+            // Filter critical after loading everything
             if (filterCritical)
             {
-                dt = dt.AsEnumerable()
-                    .Where(r => Convert.ToInt32(r["Quantity"]) < Convert.ToInt32(r["SafetyStockLevel"]) / 3)
-                    .CopyToDataTable();
+                var filtered = dt.AsEnumerable()
+                    .Where(r => Convert.ToInt32(r["Quantity"]) < Convert.ToInt32(r["SafetyStockLevel"]) / 3);
+
+                dt = filtered.Any() ? filtered.CopyToDataTable() : dt.Clone(); // fallback to empty if none
             }
 
             dataGridViewReorderProducts.DataSource = dt;
             productTable = dt;
 
-            // Initialize ComboBox search list
+            // Update ComboBox items
             allProductNames = dt.AsEnumerable()
                 .Select(r => r.Field<string>("Name"))
                 .Distinct()
@@ -193,6 +194,7 @@ namespace SokProodos
 
             UpdateSearchComboBoxItems(allProductNames);
         }
+
 
         private void UpdateSearchComboBoxItems(List<string> items)
         {
@@ -322,25 +324,29 @@ namespace SokProodos
 
                 int criticalThreshold = safetyStock / 3;
 
-                // Quantity below 1/3 of safety stock
                 if (quantity < criticalThreshold)
                 {
                     row.DefaultCellStyle.BackColor = Color.LightCoral;
                     row.DefaultCellStyle.ForeColor = Color.White;
                 }
-                // Quantity below reorder point but not critical
                 else if (quantity < reorderPoint)
                 {
                     row.DefaultCellStyle.BackColor = Color.MistyRose;
                     row.DefaultCellStyle.ForeColor = Color.Black;
                 }
+                else
+                {
+                    // ✅ Όσα δεν χρειάζονται αναπαραγγελία να είναι λευκά
+                    row.DefaultCellStyle.BackColor = Color.White;
+                    row.DefaultCellStyle.ForeColor = Color.Black;
+                }
             }
             catch (Exception ex)
             {
-                // log or debug
                 Console.WriteLine($"Formatting error on row {e.RowIndex}: {ex.Message}");
             }
         }
+
 
 
 

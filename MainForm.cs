@@ -1067,7 +1067,7 @@ namespace SokProodos
                     string query = @"
                 SELECT 
                     PO.PurchaseOrderID AS OrderID, 
-                    CONVERT(VARCHAR(10), PO.ShipDate, 120) AS DueDate, -- ship date used but header renamed below
+                    CONVERT(VARCHAR(10), PO.ShipDate, 120) AS ShipDate,
                     CAST(PO.SubTotal + PO.TaxAmt AS decimal(10,2)) AS TotalDue
                 FROM Purchasing.PurchaseOrderHeader PO
                 WHERE PO.Status = 1;";
@@ -1077,59 +1077,55 @@ namespace SokProodos
                         DataTable dt = new DataTable();
                         adapter.Fill(dt);
 
-                        if (DataGridViewPurchaseOrders == null)
+                        // ✅ Only update the data
+                        var currentDataSource = DataGridViewPurchaseOrders.DataSource as DataTable;
+
+                        if (currentDataSource == null || DataGridViewPurchaseOrders.Columns.Count == 0)
                         {
-                            MessageBox.Show("DataGridViewPurchaseOrders is null.");
-                            return;
+                            // First time setup (structure & styling)
+                            DataGridViewPurchaseOrders.DataSource = dt;
+
+                            // Add buttons only once
+                            if (!DataGridViewPurchaseOrders.Columns.Contains("Approve"))
+                            {
+                                DataGridViewButtonColumn approveButton = new DataGridViewButtonColumn
+                                {
+                                    Name = "Approve",
+                                    HeaderText = "👍",
+                                    Text = "👍",
+                                    UseColumnTextForButtonValue = true,
+                                    FlatStyle = FlatStyle.Flat,
+                                    Width = 50
+                                };
+                                DataGridViewPurchaseOrders.Columns.Add(approveButton);
+                            }
+
+                            if (!DataGridViewPurchaseOrders.Columns.Contains("Reject"))
+                            {
+                                DataGridViewButtonColumn rejectButton = new DataGridViewButtonColumn
+                                {
+                                    Name = "Reject",
+                                    HeaderText = "👎",
+                                    Text = "👎",
+                                    UseColumnTextForButtonValue = true,
+                                    FlatStyle = FlatStyle.Flat,
+                                    Width = 50
+                                };
+                                DataGridViewPurchaseOrders.Columns.Add(rejectButton);
+                            }
+
+                            // Style once
+                            StyleMinimalGrid(DataGridViewPurchaseOrders);
+                        }
+                        else
+                        {
+                            // Just replace data without touching layout
+                            currentDataSource.Clear();
+                            foreach (DataRow row in dt.Rows)
+                                currentDataSource.ImportRow(row);
                         }
 
-                        DataGridViewPurchaseOrders.DataSource = dt;
-
-                        // Change column header to "ShipDate"
-                        if (DataGridViewPurchaseOrders.Columns.Contains("DueDate"))
-                        {
-                            DataGridViewPurchaseOrders.Columns["DueDate"].HeaderText = "ShipDate";
-                        }
-
-                        // Remove previous Approve/Reject buttons if they exist
-                        if (DataGridViewPurchaseOrders.Columns.Contains("Approve"))
-                            DataGridViewPurchaseOrders.Columns.Remove("Approve");
-                        if (DataGridViewPurchaseOrders.Columns.Contains("Reject"))
-                            DataGridViewPurchaseOrders.Columns.Remove("Reject");
-
-                        // Approve button
-                        DataGridViewButtonColumn approveButton = new DataGridViewButtonColumn
-                        {
-                            Name = "Approve",
-                            HeaderText = "👍",
-                            Text = "👍",
-                            UseColumnTextForButtonValue = true,
-                            FlatStyle = FlatStyle.Flat,
-                            Width = 50
-                        };
-                        DataGridViewPurchaseOrders.Columns.Add(approveButton);
-
-                        // Reject button
-                        DataGridViewButtonColumn rejectButton = new DataGridViewButtonColumn
-                        {
-                            Name = "Reject",
-                            HeaderText = "👎",
-                            Text = "👎",
-                            UseColumnTextForButtonValue = true,
-                            FlatStyle = FlatStyle.Flat,
-                            Width = 50
-                        };
-                        DataGridViewPurchaseOrders.Columns.Add(rejectButton);
-
-                        // Same height as Sales Orders grid
                         DataGridViewPurchaseOrders.RowTemplate.Height = dataGridViewOpenOrders.RowTemplate.Height;
-
-                        // Uniform size and position
-                        DataGridViewPurchaseOrders.Size = dataGridViewOpenOrders.Size;
-                        DataGridViewPurchaseOrders.Location = new Point(
-                            dataGridViewOpenOrders.Location.X,
-                            dataGridViewOpenOrders.Location.Y + dataGridViewOpenOrders.Height + 10
-                        );
                     }
                 }
             }
@@ -1138,8 +1134,6 @@ namespace SokProodos
                 MessageBox.Show("Error loading purchase orders: " + ex.Message);
             }
         }
-
-
 
 
 

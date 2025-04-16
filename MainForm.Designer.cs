@@ -178,7 +178,7 @@
             this.buttonOrderStatus.Name = "buttonOrderStatus";
             this.buttonOrderStatus.Size = new System.Drawing.Size(102, 27);
             this.buttonOrderStatus.TabIndex = 31;
-            this.buttonOrderStatus.Text = "Orders";
+            this.buttonOrderStatus.Text = "📋 Order Status";
             this.buttonOrderStatus.UseVisualStyleBackColor = true;
             this.buttonOrderStatus.Click += new System.EventHandler(this.buttonOrderStatus_Click);
             // 

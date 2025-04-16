@@ -1038,7 +1038,8 @@ namespace SokProodos
                 return;
 
             var row = grid.Rows[e.RowIndex];
-            string purchaseOrderId = row.Cells["PurchaseOrderID"].Value.ToString();
+            string purchaseOrderId = row.Cells["OrderID"].Value.ToString(); // ✅ Το σωστό column name
+
             int newStatus = columnName == "Approve" ? 2 : 3;
             string action = columnName == "Approve" ? "approve" : "reject";
 
@@ -1158,20 +1159,39 @@ namespace SokProodos
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    string query = @"
+
+                    // Ενημέρωση κατάστασης της παραγγελίας
+                    string updateQuery = @"
                 UPDATE Purchasing.PurchaseOrderHeader
                 SET Status = @status
                 WHERE PurchaseOrderID = @id";
 
-                    using (SqlCommand cmd = new SqlCommand(query, conn))
+                    using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
                     {
                         cmd.Parameters.AddWithValue("@status", newStatus);
                         cmd.Parameters.AddWithValue("@id", purchaseOrderId);
                         cmd.ExecuteNonQuery();
                     }
 
+                    // Αν εγκριθεί η παραγγελία => ενημέρωσε το απόθεμα
+                    if (newStatus == 2) // 2 = Approved
+                    {
+                        string stockUpdateQuery = @"
+                    UPDATE pi
+                    SET pi.Quantity = pi.Quantity + pod.OrderQty
+                    FROM Production.ProductInventory pi
+                    INNER JOIN Purchasing.PurchaseOrderDetail pod ON pi.ProductID = pod.ProductID
+                    WHERE pod.PurchaseOrderID = @poId";
+
+                        using (SqlCommand cmdStock = new SqlCommand(stockUpdateQuery, conn))
+                        {
+                            cmdStock.Parameters.AddWithValue("@poId", purchaseOrderId);
+                            cmdStock.ExecuteNonQuery();
+                        }
+                    }
+
                     MessageBox.Show("Purchase order updated successfully!");
-                    LoadPurchaseOrders(); // Refresh after update
+                    LoadPurchaseOrders(); // Ανανεώνει τον πίνακα
                 }
             }
             catch (Exception ex)
@@ -1179,6 +1199,7 @@ namespace SokProodos
                 MessageBox.Show("Error updating purchase order: " + ex.Message);
             }
         }
+
 
 
 
@@ -1531,33 +1552,56 @@ namespace SokProodos
                 int gridWidth = 430;
                 int gridHeight = 210;
                 int spacing = 10;
+                int labelHeight = 25;
 
                 panelOrderStatus = new Panel
                 {
                     Name = "panelOrderStatus",
-                    Size = new Size(gridWidth * 2 + spacing + 20, 0), // ✅ Ακριβώς όσο χρειάζεται
+                    Size = new Size(gridWidth * 2 + spacing + 20, gridHeight + labelHeight + 30),
                     BackColor = Color.FromArgb(0, 180, 200),
                     Padding = new Padding(10),
                     BorderStyle = BorderStyle.None,
                     Visible = false
                 };
 
-                // ✅ Τοποθέτηση κάτω από το κουμπί
                 int x = btn.Left;
                 int y = btn.Bottom + 5;
                 panelOrderStatus.Location = new Point(x, y);
 
-                // ✅ Ευθυγράμμιση και μέγεθος grids
+                // ✅ Sales Orders Grid
                 dataGridViewOpenOrders.Width = gridWidth;
                 dataGridViewOpenOrders.Height = gridHeight;
                 dataGridViewOpenOrders.Location = new Point(10, 10);
+                panelOrderStatus.Controls.Add(dataGridViewOpenOrders);
 
+                // ✅ Purchase Orders Grid
                 DataGridViewPurchaseOrders.Width = gridWidth;
                 DataGridViewPurchaseOrders.Height = gridHeight;
                 DataGridViewPurchaseOrders.Location = new Point(10 + gridWidth + spacing, 10);
-
-                panelOrderStatus.Controls.Add(dataGridViewOpenOrders);
                 panelOrderStatus.Controls.Add(DataGridViewPurchaseOrders);
+
+                // ✅ Sales Orders Label (κάτω από το grid)
+                Label labelSales = new Label
+                {
+                    Text = "🛒 Sales Orders",
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    ForeColor = Color.White,
+                    AutoSize = true,
+                    Location = new Point(10 + (gridWidth - 130) / 2, 10 + gridHeight + 5) // κέντρο κάτω από grid
+                };
+                panelOrderStatus.Controls.Add(labelSales);
+
+                // ✅ Purchase Orders Label (κάτω από το grid)
+                Label labelPurchase = new Label
+                {
+                    Text = "📥 Purchase Orders",
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    ForeColor = Color.White,
+                    AutoSize = true,
+                    Location = new Point(10 + gridWidth + spacing + (gridWidth - 150) / 2, 10 + gridHeight + 5)
+                };
+                panelOrderStatus.Controls.Add(labelPurchase);
+
                 this.Controls.Add(panelOrderStatus);
                 panelOrderStatus.BringToFront();
             }
@@ -1580,6 +1624,7 @@ namespace SokProodos
             panelOrderStatus.BringToFront();
         }
     }
+
     public static class ChartExtensions
     {
         public static void DoubleBuffered(this Control control, bool enable)

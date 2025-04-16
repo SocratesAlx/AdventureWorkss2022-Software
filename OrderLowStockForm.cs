@@ -273,8 +273,8 @@ namespace SokProodos
         private void buttonConfirmOrder_Click(object sender, EventArgs e)
         {
             if (comboBoxVendors.SelectedValue == null ||
-        comboBoxEmployees.SelectedValue == null ||
-        comboBoxShipMethod.SelectedValue == null)
+                comboBoxEmployees.SelectedValue == null ||
+                comboBoxShipMethod.SelectedValue == null)
             {
                 MessageBox.Show("Please select Vendor, Employee and Ship Method before confirming the order.", "Missing Info", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -288,14 +288,12 @@ namespace SokProodos
                 int employeeId = Convert.ToInt32(comboBoxEmployees.SelectedValue);
                 int shipMethodId = Convert.ToInt32(comboBoxShipMethod.SelectedValue);
 
-                // Dates
                 DateTime orderDate = DateTime.Today;
                 DateTime.TryParse(textBoxOrderDate.Text, out orderDate);
 
                 DateTime dueDate = orderDate.AddDays(7); // fallback
                 DateTime.TryParse(textBoxDueDate.Text, out dueDate);
 
-                // Subtotal
                 decimal subtotal = 0;
                 foreach (DataGridViewRow row in dataGridViewInvoiceItems.Rows)
                 {
@@ -306,17 +304,15 @@ namespace SokProodos
                         subtotal += val;
                 }
 
-                // Tax
-                decimal taxAmount = 0;
-                decimal.TryParse(textBoxTaxAmount.Text.Replace("€", "").Replace("$", "").Trim(), out taxAmount);
+                decimal.TryParse(textBoxTaxAmount.Text.Replace("€", "").Replace("$", "").Trim(), out decimal taxAmount);
 
-                // 1. Create PurchaseOrderHeader
+                // ✅ Step 1: Create PurchaseOrderHeader
                 SqlCommand cmdHeader = new SqlCommand(@"
             INSERT INTO Purchasing.PurchaseOrderHeader 
             (RevisionNumber, Status, EmployeeID, VendorID, ShipMethodID, OrderDate, ShipDate, SubTotal, TaxAmt, Freight)
             OUTPUT INSERTED.PurchaseOrderID
             VALUES 
-            (1, 2, @EmployeeID, @VendorID, @ShipMethodID, @OrderDate, @ShipDate, @SubTotal, @TaxAmt, 0)", conn);
+            (1, 1, @EmployeeID, @VendorID, @ShipMethodID, @OrderDate, @ShipDate, @SubTotal, @TaxAmt, 0)", conn);
 
                 cmdHeader.Parameters.AddWithValue("@EmployeeID", employeeId);
                 cmdHeader.Parameters.AddWithValue("@VendorID", vendorId);
@@ -328,7 +324,7 @@ namespace SokProodos
 
                 int poId = (int)cmdHeader.ExecuteScalar();
 
-                // 2. Insert into PurchaseOrderDetail
+                // ✅ Step 2: Create PurchaseOrderDetails (but not apply stock yet)
                 foreach (DataGridViewRow row in dataGridViewInvoiceItems.Rows)
                 {
                     if (row.IsNewRow) continue;
@@ -339,31 +335,25 @@ namespace SokProodos
                     if (!decimal.TryParse(unitStr, out decimal unitPrice)) unitPrice = 0;
 
                     SqlCommand cmdDetail = new SqlCommand(@"
-    INSERT INTO Purchasing.PurchaseOrderDetail 
-    (PurchaseOrderID, DueDate, OrderQty, ProductID, UnitPrice, ReceivedQty, RejectedQty)
-    VALUES 
-    (@POID, @DueDate, @Qty, @ProductID, @UnitPrice, 0, 0)", conn);
-
+                INSERT INTO Purchasing.PurchaseOrderDetail 
+                (PurchaseOrderID, DueDate, OrderQty, ProductID, UnitPrice, ReceivedQty, RejectedQty)
+                VALUES 
+                (@POID, @DueDate, @Qty, @ProductID, @UnitPrice, 0, 0)", conn);
 
                     cmdDetail.Parameters.AddWithValue("@POID", poId);
                     cmdDetail.Parameters.AddWithValue("@DueDate", dueDate);
                     cmdDetail.Parameters.AddWithValue("@Qty", qty);
                     cmdDetail.Parameters.AddWithValue("@ProductID", productId);
                     cmdDetail.Parameters.AddWithValue("@UnitPrice", unitPrice);
-
-
                     cmdDetail.ExecuteNonQuery();
                 }
             }
 
-            MessageBox.Show("Purchase Order created successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Purchase Order created successfully and awaiting approval!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             MainForm MainForm = new MainForm();
             MainForm.Show();
-
-
             this.Hide();
-            
-
         }
+
     }
 }

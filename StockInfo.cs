@@ -28,7 +28,7 @@ namespace SokProodos
             comboBoxStock.SelectedIndexChanged += comboBoxStock_SelectedIndexChanged;
         }
 
-        
+
 
         private void LoadStockItems()
         {
@@ -39,10 +39,10 @@ namespace SokProodos
                 try
                 {
                     connection.Open();
+
                     string query = @"
                 SELECT ProductID, Name 
                 FROM Production.Product 
-                WHERE FinishedGoodsFlag = 1
                 ORDER BY Name ASC;";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
@@ -67,6 +67,8 @@ namespace SokProodos
             }
         }
 
+
+
         private void LoadStockInfo(int productId)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -75,33 +77,13 @@ namespace SokProodos
                 {
                     connection.Open();
                     string query = @"
-                SELECT 
-                    p.ProductID,
-                    p.Name AS ProductName,
-                    p.ProductNumber,
-                    p.Color,
-                    p.StandardCost,
-                    p.ListPrice,
-                    p.Size,
-                    p.Weight,
-                    p.SafetyStockLevel,
-                    p.ReorderPoint,
-                    p.DaysToManufacture,
-                    ps.Name AS Subcategory,
-                    pm.Name AS Model,
-                    ISNULL(pi.Quantity, 0) AS StockQuantity,
-                    l.Name AS Location,
-                    pi.Shelf,
-                    pi.Bin,
-                    ISNULL(so.Description, 'No Discount') AS SpecialOffer
-                FROM Production.Product p
-                LEFT JOIN Production.ProductSubcategory ps ON p.ProductSubcategoryID = ps.ProductSubcategoryID
-                LEFT JOIN Production.ProductModel pm ON p.ProductModelID = pm.ProductModelID
-                LEFT JOIN Production.ProductInventory pi ON p.ProductID = pi.ProductID
-                LEFT JOIN Production.Location l ON pi.LocationID = l.LocationID
-                LEFT JOIN Sales.SpecialOfferProduct sop ON p.ProductID = sop.ProductID
-                LEFT JOIN Sales.SpecialOffer so ON sop.SpecialOfferID = so.SpecialOfferID
-                WHERE p.ProductID = @ProductID;";
+            SELECT 
+                p.ProductID,
+                p.Name AS ProductName,
+                ISNULL(pi.Quantity, 0) AS StockQuantity
+            FROM Production.Product p
+            LEFT JOIN Production.ProductInventory pi ON p.ProductID = pi.ProductID
+            WHERE p.ProductID = @ProductID;";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
@@ -112,8 +94,15 @@ namespace SokProodos
                             DataTable dt = new DataTable();
                             adapter.Fill(dt);
 
-                            
-                            dataGridViewStockInfo.DataSource = dt;
+                            if (dt.Rows.Count > 0)
+                            {
+                                dataGridViewStockInfo.DataSource = dt;
+                            }
+                            else
+                            {
+                                dataGridViewStockInfo.DataSource = null;
+                                MessageBox.Show("No product data found.", "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            }
                         }
                     }
                 }
@@ -123,6 +112,8 @@ namespace SokProodos
                 }
             }
         }
+
+
 
         private void comboBoxStock_SelectedIndexChanged(object sender, EventArgs e)
         {

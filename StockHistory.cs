@@ -75,7 +75,7 @@ namespace SokProodos
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
-                    string query = "SELECT ProductID, Name FROM Production.Product WHERE FinishedGoodsFlag = 1";
+                    string query = "SELECT ProductID, Name FROM Production.Product ORDER BY Name";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -104,13 +104,11 @@ namespace SokProodos
 
 
 
+
         private void LoadStockHistory(string productNameFilter = "", int productIdFilter = 0)
         {
             if (dataGridViewStockHistory == null)
-            {
-                MessageBox.Show("Error: DataGridView is not initialized!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
-            }
 
             try
             {
@@ -120,81 +118,36 @@ namespace SokProodos
                 {
                     connection.Open();
                     string query = @"
-                SELECT TOP 100
-                    p.ProductID, 
-                    p.Name AS ProductName, 
-                    pi.LocationID, 
-                    pi.Quantity AS RemainingStock, 
-                    pi.ModifiedDate AS LastUpdated
-                FROM Production.ProductInventory pi
-                JOIN Production.Product p ON pi.ProductID = p.ProductID
-                WHERE p.FinishedGoodsFlag = 1";
+            SELECT 
+                p.ProductID, 
+                p.Name AS ProductName, 
+                ISNULL(pi.Quantity, 0) AS StockQuantity,
+                pi.ModifiedDate
+            FROM Production.Product p
+            LEFT JOIN Production.ProductInventory pi ON p.ProductID = pi.ProductID
+            WHERE 1 = 1";
 
                     if (!string.IsNullOrWhiteSpace(productNameFilter))
-                    {
                         query += " AND p.Name LIKE @ProductName";
-                    }
 
                     if (productIdFilter > 0)
-                    {
                         query += " AND p.ProductID = @ProductID";
-                    }
 
                     query += " ORDER BY pi.ModifiedDate DESC";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {
                         if (!string.IsNullOrWhiteSpace(productNameFilter))
-                        {
                             command.Parameters.AddWithValue("@ProductName", "%" + productNameFilter + "%");
-                        }
 
                         if (productIdFilter > 0)
-                        {
                             command.Parameters.AddWithValue("@ProductID", productIdFilter);
-                        }
 
                         using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                         {
                             DataTable dt = new DataTable();
                             adapter.Fill(dt);
-
-                            if (dt.Rows.Count > 0)
-                            {
-                                dataGridViewStockHistory.DataSource = dt;
-
-                                // --- Styling applied after binding ---
-                                dataGridViewStockHistory.EnableHeadersVisualStyles = false;
-                                dataGridViewStockHistory.ColumnHeadersDefaultCellStyle.BackColor = Color.White;
-                                dataGridViewStockHistory.ColumnHeadersDefaultCellStyle.ForeColor = Color.Black;
-                                dataGridViewStockHistory.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Bold);
-
-                                dataGridViewStockHistory.DefaultCellStyle.BackColor = Color.White;
-                                dataGridViewStockHistory.DefaultCellStyle.ForeColor = Color.Black;
-                                dataGridViewStockHistory.DefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Regular);
-                                dataGridViewStockHistory.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245);
-                                dataGridViewStockHistory.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-                                dataGridViewStockHistory.GridColor = Color.FromArgb(200, 200, 200);
-                                dataGridViewStockHistory.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-                                dataGridViewStockHistory.ScrollBars = ScrollBars.Both;
-
-                                // Hover effects
-                                dataGridViewStockHistory.CellMouseEnter += (s, e) =>
-                                {
-                                    if (e.RowIndex >= 0)
-                                        dataGridViewStockHistory.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.FromArgb(230, 230, 230);
-                                };
-
-                                dataGridViewStockHistory.CellMouseLeave += (s, e) =>
-                                {
-                                    if (e.RowIndex >= 0)
-                                        dataGridViewStockHistory.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.White;
-                                };
-                            }
-                            else
-                            {
-                                MessageBox.Show("No data found for the selected filters.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            }
+                            dataGridViewStockHistory.DataSource = dt;
                         }
                     }
                 }
@@ -232,15 +185,22 @@ namespace SokProodos
             if (comboBoxProductName.SelectedItem != null)
             {
                 var selectedProduct = (KeyValuePair<int, string>)comboBoxProductName.SelectedItem;
-                textBoxProductID.Text = selectedProduct.Key.ToString(); 
+                textBoxProductID.Text = selectedProduct.Key.ToString();
                 LoadStockHistory(selectedProduct.Value, selectedProduct.Key);
             }
         }
 
         private void textBoxProductID_TextChanged(object sender, EventArgs e)
         {
-            if (int.TryParse(textBoxProductID.Text, out int productId))
+            if (int.TryParse(textBoxProductID.Text.Trim(), out int productId))
             {
+                var matched = comboBoxProductName.Items
+                    .OfType<KeyValuePair<int, string>>()
+                    .FirstOrDefault(kvp => kvp.Key == productId);
+
+                if (!matched.Equals(default(KeyValuePair<int, string>)))
+                    comboBoxProductName.SelectedItem = matched;
+
                 LoadStockHistory("", productId);
             }
         }

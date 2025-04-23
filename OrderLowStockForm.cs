@@ -45,7 +45,7 @@ namespace SokProodos
         }
         private void UpdateDueDateBasedOnShipMethod()
         {
-            int extraDays = 7; // Default fallback
+            int extraDays = 7; 
 
             if (comboBoxShipMethod.SelectedItem is DataRowView drv)
             {
@@ -117,7 +117,7 @@ namespace SokProodos
                 comboBoxShipMethod.ValueMember = "ShipMethodID";
             }
 
-            // ➕ Βάλε το εδώ για να κληθεί ΜΕΤΑ την πλήρωση δεδομένων
+            
             UpdateDueDateBasedOnShipMethod();
         }
 
@@ -164,7 +164,7 @@ namespace SokProodos
 
             dataGridViewInvoiceItems.DataSource = invoiceTable;
 
-            // Allow only QuantityToReorder to be editable
+            
             foreach (DataGridViewColumn col in dataGridViewInvoiceItems.Columns)
                 col.ReadOnly = true;
 
@@ -219,38 +219,38 @@ namespace SokProodos
         {
             var grid = dataGridViewInvoiceItems;
 
-            // General UI
+            
             grid.EnableHeadersVisualStyles = false;
             grid.BorderStyle = BorderStyle.None;
             grid.RowHeadersVisible = false;
 
-            // Header Style
+            
             grid.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245);
             grid.ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(40, 40, 40);
             grid.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
             grid.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             grid.ColumnHeadersHeight = 35;
 
-            // Cell Style
+            
             grid.DefaultCellStyle.BackColor = Color.White;
             grid.DefaultCellStyle.ForeColor = Color.Black;
             grid.DefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Regular);
             grid.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             grid.DefaultCellStyle.Padding = new Padding(4, 2, 4, 2);
 
-            // Alternating Rows
+            
             grid.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 248, 255);
 
-            // Borders
+            
             grid.CellBorderStyle = DataGridViewCellBorderStyle.None;
             grid.GridColor = Color.Gainsboro;
 
-            // Columns
+            
             grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             grid.AutoResizeColumns();
             grid.ScrollBars = ScrollBars.Both;
 
-            // Hover Effect
+            
             grid.CellMouseEnter += (s, e) =>
             {
                 if (e.RowIndex >= 0)
@@ -291,7 +291,7 @@ namespace SokProodos
                 DateTime orderDate = DateTime.Today;
                 DateTime.TryParse(textBoxOrderDate.Text, out orderDate);
 
-                DateTime dueDate = orderDate.AddDays(7); // fallback
+                DateTime dueDate = orderDate.AddDays(7); 
                 DateTime.TryParse(textBoxDueDate.Text, out dueDate);
 
                 decimal subtotal = 0;
@@ -306,7 +306,7 @@ namespace SokProodos
 
                 decimal.TryParse(textBoxTaxAmount.Text.Replace("€", "").Replace("$", "").Trim(), out decimal taxAmount);
 
-                // ✅ Step 1: Create PurchaseOrderHeader
+                
                 SqlCommand cmdHeader = new SqlCommand(@"
             INSERT INTO Purchasing.PurchaseOrderHeader 
             (RevisionNumber, Status, EmployeeID, VendorID, ShipMethodID, OrderDate, ShipDate, SubTotal, TaxAmt, Freight)
@@ -324,7 +324,7 @@ namespace SokProodos
 
                 int poId = (int)cmdHeader.ExecuteScalar();
 
-                // ✅ Step 2: Create PurchaseOrderDetails (but not apply stock yet)
+                
                 foreach (DataGridViewRow row in dataGridViewInvoiceItems.Rows)
                 {
                     if (row.IsNewRow) continue;

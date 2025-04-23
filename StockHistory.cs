@@ -47,11 +47,11 @@ namespace SokProodos
                     btn.Padding = new Padding(0);
                     btn.Cursor = Cursors.Hand;
 
-                    // Hover
+                    
                     btn.MouseEnter += (s, e) => btn.BackColor = Color.FromArgb(0, 140, 160);
                     btn.MouseLeave += (s, e) => btn.BackColor = Color.FromArgb(0, 160, 180);
 
-                    // Rounded corners
+                    
                     btn.Paint += (s, e) =>
                     {
                         GraphicsPath path = GraphicsExtensions.CreateRoundedRect(btn.ClientRectangle, 8);

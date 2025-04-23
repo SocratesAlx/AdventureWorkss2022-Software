@@ -54,7 +54,7 @@ namespace SokProodos
 
             panelInfo.Controls.Add(DataGridViewPurchaseOrders);
 
-            LoadPurchaseOrders(); // 👈 ADD THIS LINE
+            LoadPurchaseOrders(); 
 
 
 
@@ -303,7 +303,7 @@ namespace SokProodos
                             labelReorderProducts.Font = new Font("Segoe UI", 10, FontStyle.Bold | FontStyle.Underline);
                             labelReorderProducts.Cursor = Cursors.Hand;
 
-                            // Προσθέτουμε τα events για highlight
+                            
                             labelReorderProducts.MouseEnter += (s, e) =>
                             {
                                 labelReorderProducts.ForeColor = Color.OrangeRed;
@@ -437,7 +437,7 @@ namespace SokProodos
                 btn.MouseEnter += (s, e) => btn.BackColor = hoverColor;
                 btn.MouseLeave += (s, e) => btn.BackColor = buttonColor;
 
-                // Round corners properly after paint (when size is known)
+                
                 btn.Paint += (s, e) =>
                 {
                     GraphicsPath path = GraphicsExtensions.CreateRoundedRect(btn.ClientRectangle, 8);
@@ -655,12 +655,12 @@ namespace SokProodos
                         adapter.Fill(dt);
                         dataGridViewOpenOrders.DataSource = dt;
 
-                        // Remove old Approve/Reject buttons
+                        
                         foreach (var col in new[] { "Approve", "Reject" })
                             if (dataGridViewOpenOrders.Columns.Contains(col))
                                 dataGridViewOpenOrders.Columns.Remove(col);
 
-                        // Add Approve button
+                        
                         DataGridViewButtonColumn approveButton = new DataGridViewButtonColumn
                         {
                             Name = "Approve",
@@ -672,7 +672,7 @@ namespace SokProodos
                         };
                         dataGridViewOpenOrders.Columns.Add(approveButton);
 
-                        // Add Reject button
+                        
                         DataGridViewButtonColumn rejectButton = new DataGridViewButtonColumn
                         {
                             Name = "Reject",
@@ -684,7 +684,7 @@ namespace SokProodos
                         };
                         dataGridViewOpenOrders.Columns.Add(rejectButton);
 
-                        // Same row height
+                        
                         dataGridViewOpenOrders.RowTemplate.Height = 35;
                     }
                 }
@@ -743,7 +743,7 @@ namespace SokProodos
                 {
                     conn.Open();
 
-                    // Update Status in Sales.SalesOrderHeader
+                    
                     string updateHeader = "UPDATE Sales.SalesOrderHeader SET Status = @status WHERE SalesOrderID = @id";
                     using (SqlCommand cmd = new SqlCommand(updateHeader, conn))
                     {
@@ -752,7 +752,7 @@ namespace SokProodos
                         cmd.ExecuteNonQuery();
                     }
 
-                    // Update or Insert into OrderApprovals
+                    
                     string upsertApproval = @"
                 IF EXISTS (SELECT 1 FROM OrderApprovals WHERE SalesOrderID = @id)
                     UPDATE OrderApprovals SET Approved = @approved WHERE SalesOrderID = @id;
@@ -1038,7 +1038,7 @@ namespace SokProodos
                 return;
 
             var row = grid.Rows[e.RowIndex];
-            string purchaseOrderId = row.Cells["OrderID"].Value.ToString(); // ✅ Το σωστό column name
+            string purchaseOrderId = row.Cells["OrderID"].Value.ToString(); 
 
             int newStatus = columnName == "Approve" ? 2 : 3;
             string action = columnName == "Approve" ? "approve" : "reject";
@@ -1077,15 +1077,15 @@ namespace SokProodos
                         DataTable dt = new DataTable();
                         adapter.Fill(dt);
 
-                        // ✅ Only update the data
+                        
                         var currentDataSource = DataGridViewPurchaseOrders.DataSource as DataTable;
 
                         if (currentDataSource == null || DataGridViewPurchaseOrders.Columns.Count == 0)
                         {
-                            // First time setup (structure & styling)
+                            
                             DataGridViewPurchaseOrders.DataSource = dt;
 
-                            // Add buttons only once
+                            
                             if (!DataGridViewPurchaseOrders.Columns.Contains("Approve"))
                             {
                                 DataGridViewButtonColumn approveButton = new DataGridViewButtonColumn
@@ -1114,12 +1114,12 @@ namespace SokProodos
                                 DataGridViewPurchaseOrders.Columns.Add(rejectButton);
                             }
 
-                            // Style once
+                            
                             StyleMinimalGrid(DataGridViewPurchaseOrders);
                         }
                         else
                         {
-                            // Just replace data without touching layout
+                            
                             currentDataSource.Clear();
                             foreach (DataRow row in dt.Rows)
                                 currentDataSource.ImportRow(row);

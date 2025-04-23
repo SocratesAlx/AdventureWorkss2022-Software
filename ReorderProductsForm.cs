@@ -14,7 +14,7 @@ namespace SokProodos
     public partial class ReorderProductsForm : Form
     {
         private string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
-        private DataTable productTable; // Add this at the top of the class
+        private DataTable productTable; 
         private List<string> allProductNames = new List<string>();
 
 
@@ -54,7 +54,7 @@ namespace SokProodos
             {
                 dataGridViewReorderProducts.DataSource = filteredRows.CopyToDataTable();
 
-                // Update dropdown items too
+                
                 var filteredNames = filteredRows
                     .Select(r => r.Field<string>("Name"))
                     .Distinct()
@@ -72,12 +72,12 @@ namespace SokProodos
 
         private void StyleReorderProductsGrid()
         {
-            // Basic UI tweaks
+            
             dataGridViewReorderProducts.EnableHeadersVisualStyles = false;
             dataGridViewReorderProducts.BorderStyle = BorderStyle.None;
             dataGridViewReorderProducts.RowHeadersVisible = false;
 
-            // Header style
+            
             dataGridViewReorderProducts.ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245);
             dataGridViewReorderProducts.ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(40, 40, 40);
             dataGridViewReorderProducts.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
@@ -85,26 +85,26 @@ namespace SokProodos
             dataGridViewReorderProducts.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewReorderProducts.ColumnHeadersHeight = 35;
 
-            // Cell style
+            
             dataGridViewReorderProducts.DefaultCellStyle.BackColor = Color.White;
             dataGridViewReorderProducts.DefaultCellStyle.ForeColor = Color.Black;
             dataGridViewReorderProducts.DefaultCellStyle.Font = new Font("Segoe UI", 9, FontStyle.Regular);
             dataGridViewReorderProducts.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewReorderProducts.DefaultCellStyle.Padding = new Padding(4, 2, 4, 2);
 
-            // Alternating rows
+            
             dataGridViewReorderProducts.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 248, 255);
 
-            // Grid & borders
+            
             dataGridViewReorderProducts.CellBorderStyle = DataGridViewCellBorderStyle.None;
             dataGridViewReorderProducts.GridColor = Color.Gainsboro;
 
-            // Columns
+            
             dataGridViewReorderProducts.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
             dataGridViewReorderProducts.AutoResizeColumns();
             dataGridViewReorderProducts.ScrollBars = ScrollBars.Both;
 
-            // Hover effect
+            
             dataGridViewReorderProducts.CellMouseEnter += (s, e) =>
             {
                 if (e.RowIndex >= 0)
@@ -162,7 +162,7 @@ namespace SokProodos
                 }
             }
 
-            // Add extra columns
+            
             dt.Columns.Add("QuantityToReorder", typeof(int));
             dt.Columns.Add("Select", typeof(bool));
 
@@ -174,7 +174,7 @@ namespace SokProodos
                 row["Select"] = false;
             }
 
-            // Filter critical after loading everything
+            
             if (filterCritical)
             {
                 var filtered = dt.AsEnumerable()
@@ -186,7 +186,7 @@ namespace SokProodos
             dataGridViewReorderProducts.DataSource = dt;
             productTable = dt;
 
-            // Update ComboBox items
+            
             allProductNames = dt.AsEnumerable()
                 .Select(r => r.Field<string>("Name"))
                 .Distinct()
@@ -224,7 +224,7 @@ namespace SokProodos
                 Width = 30
             };
 
-            // ProductID (hidden)
+            
             DataGridViewTextBoxColumn colProductID = new DataGridViewTextBoxColumn
             {
                 Name = "ProductID",
@@ -233,7 +233,7 @@ namespace SokProodos
                 Visible = false
             };
 
-            // Product Name (FILL)
+            
             DataGridViewTextBoxColumn colProductName = new DataGridViewTextBoxColumn
             {
                 Name = "ProductName",
@@ -244,7 +244,7 @@ namespace SokProodos
                 MinimumWidth = 150
             };
 
-            // Current Quantity
+            
             DataGridViewTextBoxColumn colQty = new DataGridViewTextBoxColumn
             {
                 Name = "Quantity",
@@ -254,7 +254,7 @@ namespace SokProodos
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
             };
 
-            // Reorder Point
+            
             DataGridViewTextBoxColumn colReorder = new DataGridViewTextBoxColumn
             {
                 Name = "ReorderPoint",
@@ -264,7 +264,7 @@ namespace SokProodos
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
             };
 
-            // Safety Stock Level
+            
             DataGridViewTextBoxColumn colSafety = new DataGridViewTextBoxColumn
             {
                 Name = "SafetyStockLevel",
@@ -274,7 +274,7 @@ namespace SokProodos
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
             };
 
-            // MakeFlag (readonly)
+            
             DataGridViewTextBoxColumn colMakeFlag = new DataGridViewTextBoxColumn
             {
                 Name = "MakeFlag",
@@ -284,7 +284,7 @@ namespace SokProodos
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
             };
 
-            // Quantity To Reorder (editable)
+            
             DataGridViewTextBoxColumn colQtyToReorder = new DataGridViewTextBoxColumn
             {
                 Name = "QuantityToReorder",
@@ -293,7 +293,7 @@ namespace SokProodos
                 AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells
             };
 
-            // Add all to grid
+            
             dataGridViewReorderProducts.Columns.AddRange(
                 colSelect,
                 colProductID,
@@ -364,7 +364,7 @@ namespace SokProodos
         }
         private void FiltersChanged(object sender, EventArgs e)
         {
-            buttonApplyFilters_Click(sender, e); // Reuse logic
+            buttonApplyFilters_Click(sender, e); 
         }
 
         private void buttonApplyFilters_Click(object sender, EventArgs e)
@@ -410,7 +410,7 @@ namespace SokProodos
         {
             if (productTable == null) return;
 
-            // Detach to avoid UI lag
+            
             dataGridViewReorderProducts.DataSource = null;
 
             foreach (DataRow row in productTable.Rows)
@@ -418,11 +418,11 @@ namespace SokProodos
                 row["Select"] = selectAll;
             }
 
-            // Rebind and reinitialize grid
+            
             InitializeReorderGrid();
             dataGridViewReorderProducts.DataSource = productTable;
 
-            // Optional: preserve styling
+            
             StyleReorderProductsGrid();
         }
 
@@ -446,7 +446,7 @@ namespace SokProodos
             ToggleButtonColor(buttonSelectAll, allSelected);
         }
 
-        // 🔶 Custom hover behavior for orange mode
+        
         private void OrangeHover(object sender, EventArgs e)
         {
             if (sender is Button btn)
@@ -513,7 +513,7 @@ namespace SokProodos
 
             triggerButton.Text = safetySelected ? "Deselect Safety Stock" : "Select Below Safety Stock";
 
-            // 🔶 Toggle color + hover
+            
             if (safetySelected)
             {
                 triggerButton.BackColor = Color.Orange;
@@ -550,7 +550,7 @@ namespace SokProodos
 
             triggerButton.Text = reorderSelected ? "Deselect Reorder Point" : "Select Below Reorder Point";
 
-            // 🔶 Toggle color + hover
+            
             if (reorderSelected)
             {
                 triggerButton.BackColor = Color.Orange;

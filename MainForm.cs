@@ -58,7 +58,7 @@ namespace SokProodos
 
 
 
-            DataGridViewPurchaseOrders.CellClick += DataGridViewPurchaseOrders_CellClick;
+            
             this.StartPosition = FormStartPosition.CenterScreen;
             UIStyler.StyleButtonsInForm(this);
 

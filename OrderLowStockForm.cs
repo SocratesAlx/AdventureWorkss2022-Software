@@ -291,7 +291,7 @@ namespace SokProodos
                 DateTime orderDate = DateTime.Today;
                 DateTime.TryParse(textBoxOrderDate.Text, out orderDate);
 
-                DateTime dueDate = orderDate.AddDays(7); 
+                DateTime dueDate = orderDate.AddDays(7); // Default due date if parsing fails
                 DateTime.TryParse(textBoxDueDate.Text, out dueDate);
 
                 decimal subtotal = 0;
@@ -306,7 +306,7 @@ namespace SokProodos
 
                 decimal.TryParse(textBoxTaxAmount.Text.Replace("€", "").Replace("$", "").Trim(), out decimal taxAmount);
 
-                
+                // Insert into PurchaseOrderHeader
                 SqlCommand cmdHeader = new SqlCommand(@"
             INSERT INTO Purchasing.PurchaseOrderHeader 
             (RevisionNumber, Status, EmployeeID, VendorID, ShipMethodID, OrderDate, ShipDate, SubTotal, TaxAmt, Freight)
@@ -324,13 +324,18 @@ namespace SokProodos
 
                 int poId = (int)cmdHeader.ExecuteScalar();
 
-                
+                // Insert PurchaseOrderDetails
                 foreach (DataGridViewRow row in dataGridViewInvoiceItems.Rows)
                 {
                     if (row.IsNewRow) continue;
 
-                    int productId = Convert.ToInt32(row.Cells["ProductID"].Value);
                     int qty = Convert.ToInt32(row.Cells["QuantityToReorder"].Value);
+
+                    // 🛡️ Check if qty is invalid
+                    if (qty <= 0)
+                        continue; // Skip rows with zero or negative quantity
+
+                    int productId = Convert.ToInt32(row.Cells["ProductID"].Value);
                     string unitStr = row.Cells["UnitPrice"].Value.ToString().Replace("€", "").Replace("$", "").Trim();
                     if (!decimal.TryParse(unitStr, out decimal unitPrice)) unitPrice = 0;
 
@@ -354,6 +359,7 @@ namespace SokProodos
             MainForm.Show();
             this.Hide();
         }
+
 
     }
 }

@@ -24,3 +24,60 @@ This software provides a simple and efficient UI for managing data within the Ad
 - **ADO.NET** for database communication
 
 ---
+
+🚀 Getting Started
+Clone the repository:
+git clone https://github.com/SocratesAlx/AdventureWorkss2022-Software.git
+
+Open the solution in Visual Studio:
+Open AdventureWorks2022-Software.sln
+
+Configure the database connection:
+
+Ensure you have the AdventureWorks2022 database installed on SQL Server.
+
+Update your connection string if necessary in /Helpers/ConnectToDB.cs.
+
+Build and run the project:
+
+Build Solution (Ctrl+Shift+B)
+
+Run (F5)
+
+📂 Project Structure
+/Forms/ - All form-related files (UI)
+
+/Helpers/ - Database connection and utility classes
+
+/Properties/ - Project settings
+
+/Resources/ - Images and resources
+
+App.config - Application settings
+
+AdventureWorks2022-Software.sln - Visual Studio solution
+
+README.md
+
+.gitignore
+
+.gitattributes
+
+⚡ Requirements
+Visual Studio 2022+
+
+.NET Framework
+
+SQL Server with AdventureWorks2022 database
+
+⚠️ Notes
+Direct database changes are performed by the application.
+
+Recommended for educational and experimental purposes.
+
+Always back up your database before major testing.
+
+📬 Contact
+Developed by SocratesAlx
+Feel free to ⭐ star the project if you find it useful!
+

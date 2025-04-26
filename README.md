@@ -25,59 +25,55 @@ This software provides a simple and efficient UI for managing data within the Ad
 
 ---
 
-🚀 Getting Started
-Clone the repository:
-git clone https://github.com/SocratesAlx/AdventureWorkss2022-Software.git
+## 🚀 Getting Started
 
-Open the solution in Visual Studio:
-Open AdventureWorks2022-Software.sln
+1. **Clone the Repository:**  
+   `git clone https://github.com/SocratesAlx/AdventureWorkss2022-Software.git`
 
-Configure the database connection:
+2. **Open the Solution:**  
+   Open `AdventureWorks2022-Software.sln` in Visual Studio.
 
-Ensure you have the AdventureWorks2022 database installed on SQL Server.
+3. **Configure Database Connection:**  
+   Make sure the AdventureWorks2022 database is installed on your SQL Server instance.  
+   Update your connection settings inside `/Helpers/ConnectToDB.cs` if necessary.
 
-Update your connection string if necessary in /Helpers/ConnectToDB.cs.
+4. **Build and Run:**  
+   - Build the solution (`Ctrl+Shift+B`)
+   - Start the application (`F5`)
 
-Build and run the project:
+---
 
-Build Solution (Ctrl+Shift+B)
+## 📂 Project Structure
 
-Run (F5)
+- `/Forms/` – All form-related files (UI)
+- `/Helpers/` – Database and UI utility classes
+- `/Properties/` – Application properties and settings
+- `/Resources/` – Images and resources
+- `App.config` – Application configuration
+- `AdventureWorks2022-Software.sln` – Visual Studio solution file
+- `README.md`
+- `.gitignore`
+- `.gitattributes`
 
-📂 Project Structure
-/Forms/ - All form-related files (UI)
+---
 
-/Helpers/ - Database connection and utility classes
+## ⚡ Requirements
 
-/Properties/ - Project settings
+- Visual Studio 2022 or newer
+- .NET Framework
+- SQL Server with the AdventureWorks2022 database
 
-/Resources/ - Images and resources
+---
 
-App.config - Application settings
+## ⚠️ Notes
 
-AdventureWorks2022-Software.sln - Visual Studio solution
+- Database operations directly modify data — backup recommended
+- Best suited for educational and experimental use
 
-README.md
+---
 
-.gitignore
+## 📬 Contact
 
-.gitattributes
-
-⚡ Requirements
-Visual Studio 2022+
-
-.NET Framework
-
-SQL Server with AdventureWorks2022 database
-
-⚠️ Notes
-Direct database changes are performed by the application.
-
-Recommended for educational and experimental purposes.
-
-Always back up your database before major testing.
-
-📬 Contact
-Developed by SocratesAlx
-Feel free to ⭐ star the project if you find it useful!
+Developed by [SocratesAlx](https://github.com/SocratesAlx)  
+Feel free to ⭐ star the repository if you find it helpful!
 

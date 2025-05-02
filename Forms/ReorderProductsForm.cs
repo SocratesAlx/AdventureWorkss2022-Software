@@ -383,12 +383,22 @@ namespace SokProodos
 
             if (dataGridViewReorderProducts.DataSource is DataTable source)
             {
-                foreach (DataGridViewRow row in dataGridViewReorderProducts.Rows)
+                foreach (DataGridViewRow gridRow in dataGridViewReorderProducts.Rows)
                 {
-                    if (Convert.ToBoolean(row.Cells["Select"].Value) == true)
+                    if (Convert.ToBoolean(gridRow.Cells["Select"].Value) == true)
                     {
-                        int rowIndex = row.Index;
-                        selectedRows.Add(source.Rows[rowIndex]);
+                        int productId = Convert.ToInt32(gridRow.Cells["ProductID"].Value);
+                        string name = Convert.ToString(gridRow.Cells["ProductName"].Value);
+                        int quantity = Convert.ToInt32(gridRow.Cells["Quantity"].Value);
+                        int qtyToReorder = Convert.ToInt32(gridRow.Cells["QuantityToReorder"].Value);
+
+                        DataRow newRow = source.NewRow();
+                        newRow["ProductID"] = productId;
+                        newRow["Name"] = name;
+                        newRow["Quantity"] = quantity;
+                        newRow["QuantityToReorder"] = qtyToReorder;
+
+                        selectedRows.Add(newRow);
                     }
                 }
 
@@ -398,13 +408,12 @@ namespace SokProodos
                     return;
                 }
 
-
                 OrderLowStockForm orderForm = new OrderLowStockForm(selectedRows);
                 orderForm.Show();
-
                 this.Hide();
             }
         }
+
 
         private void SelectAllProductsInGrid(bool selectAll = true)
         {

@@ -19,6 +19,8 @@ namespace SokProodos
         public OrderLowStockForm(List<DataRow> selectedProducts)
         {
             InitializeComponent();
+            comboBoxVendors.Visible = false;
+            label1.Visible = false; 
             this.selectedProducts = selectedProducts;
             this.StartPosition = FormStartPosition.CenterScreen;
             LoadSelectedProducts();
@@ -123,9 +125,10 @@ namespace SokProodos
 
         private void LoadSelectedProducts()
         {
-            invoiceTable = new DataTable(); // <-- Make sure it's assigned globally
+            invoiceTable = new DataTable();
             invoiceTable.Columns.Add("ProductID", typeof(int));
             invoiceTable.Columns.Add("Name", typeof(string));
+            invoiceTable.Columns.Add("VendorName", typeof(string));
             invoiceTable.Columns.Add("Quantity", typeof(int));
             invoiceTable.Columns.Add("QuantityToReorder", typeof(int));
             invoiceTable.Columns.Add("UnitPrice", typeof(decimal));
@@ -133,38 +136,56 @@ namespace SokProodos
 
             decimal totalCost = 0;
 
-            foreach (DataRow row in selectedProducts)
+            using (SqlConnection conn = new SqlConnection(connectionString))
             {
-                int productId = Convert.ToInt32(row["ProductID"]);
-                string name = row["Name"].ToString();
-                int quantity = Convert.ToInt32(row["Quantity"]);
-                int quantityToReorder = Convert.ToInt32(row["QuantityToReorder"]);
-                decimal unitPrice = 0;
-                decimal totalPrice = 0;
+                conn.Open();
 
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                foreach (DataRow row in selectedProducts)
                 {
-                    conn.Open();
-                    using (SqlCommand cmd = new SqlCommand("SELECT ListPrice FROM Production.Product WHERE ProductID = @ProductID", conn))
-                    {
-                        cmd.Parameters.AddWithValue("@ProductID", productId);
-                        object result = cmd.ExecuteScalar();
+                    int productId = Convert.ToInt32(row["ProductID"]);
+                    string name = row["Name"].ToString();
+                    int quantity = Convert.ToInt32(row["Quantity"]);
+                    int quantityToReorder = Convert.ToInt32(row["QuantityToReorder"]);
+                    decimal unitPrice = 0;
+                    string vendorName = "Unknown Vendor";
 
-                        if (result != DBNull.Value && Convert.ToDecimal(result) > 0)
+                    
+                    using (SqlCommand cmdPrice = new SqlCommand("SELECT ListPrice FROM Production.Product WHERE ProductID = @ProductID", conn))
+                    {
+                        cmdPrice.Parameters.AddWithValue("@ProductID", productId);
+                        object priceResult = cmdPrice.ExecuteScalar();
+                        if (priceResult != DBNull.Value)
                         {
-                            unitPrice = Convert.ToDecimal(result);
-                            totalPrice = unitPrice * quantityToReorder;
-                            totalCost += totalPrice;
+                            unitPrice = Convert.ToDecimal(priceResult);
                         }
                     }
-                }
 
-                invoiceTable.Rows.Add(productId, name, quantity, quantityToReorder, unitPrice, totalPrice);
+                    
+                    using (SqlCommand cmdVendor = new SqlCommand(@"
+                SELECT TOP 1 v.Name
+                FROM Purchasing.ProductVendor pv
+                INNER JOIN Purchasing.Vendor v ON pv.BusinessEntityID = v.BusinessEntityID
+                WHERE pv.ProductID = @ProductID
+                ORDER BY pv.StandardPrice ASC", conn))
+                    {
+                        cmdVendor.Parameters.AddWithValue("@ProductID", productId);
+                        object vendorResult = cmdVendor.ExecuteScalar();
+                        if (vendorResult != null && vendorResult != DBNull.Value)
+                        {
+                            vendorName = vendorResult.ToString();
+                        }
+                    }
+
+                    decimal totalPrice = unitPrice * quantityToReorder;
+                    totalCost += totalPrice;
+
+                    invoiceTable.Rows.Add(productId, name, vendorName, quantity, quantityToReorder, unitPrice, totalPrice);
+                }
             }
 
             dataGridViewInvoiceItems.DataSource = invoiceTable;
 
-            
+            // Make all columns readonly except QuantityToReorder
             foreach (DataGridViewColumn col in dataGridViewInvoiceItems.Columns)
                 col.ReadOnly = true;
 
@@ -172,6 +193,9 @@ namespace SokProodos
 
             UpdateTotalCostLabel();
         }
+
+
+
 
         private void dataGridViewInvoiceItems_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
@@ -272,94 +296,77 @@ namespace SokProodos
 
         private void buttonConfirmOrder_Click(object sender, EventArgs e)
         {
-            if (comboBoxVendors.SelectedValue == null ||
-                comboBoxEmployees.SelectedValue == null ||
-                comboBoxShipMethod.SelectedValue == null)
+            if (comboBoxEmployees.SelectedValue == null || comboBoxShipMethod.SelectedValue == null)
             {
-                MessageBox.Show("Please select Vendor, Employee and Ship Method before confirming the order.", "Missing Info", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Please select Employee and Ship Method before confirming the order.", "Missing Info", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-
-                int vendorId = Convert.ToInt32(comboBoxVendors.SelectedValue);
                 int employeeId = Convert.ToInt32(comboBoxEmployees.SelectedValue);
                 int shipMethodId = Convert.ToInt32(comboBoxShipMethod.SelectedValue);
-
                 DateTime orderDate = DateTime.Today;
                 DateTime.TryParse(textBoxOrderDate.Text, out orderDate);
-
-                DateTime dueDate = orderDate.AddDays(7); // Default due date if parsing fails
+                DateTime dueDate = orderDate.AddDays(7);
                 DateTime.TryParse(textBoxDueDate.Text, out dueDate);
-
-                decimal subtotal = 0;
-                foreach (DataGridViewRow row in dataGridViewInvoiceItems.Rows)
-                {
-                    if (row.IsNewRow) continue;
-
-                    string totalStr = row.Cells["TotalPrice"].Value.ToString().Replace("€", "").Replace("$", "").Trim();
-                    if (decimal.TryParse(totalStr, out decimal val))
-                        subtotal += val;
-                }
-
                 decimal.TryParse(textBoxTaxAmount.Text.Replace("€", "").Replace("$", "").Trim(), out decimal taxAmount);
 
-                // Insert into PurchaseOrderHeader
-                SqlCommand cmdHeader = new SqlCommand(@"
-            INSERT INTO Purchasing.PurchaseOrderHeader 
-            (RevisionNumber, Status, EmployeeID, VendorID, ShipMethodID, OrderDate, ShipDate, SubTotal, TaxAmt, Freight)
-            OUTPUT INSERTED.PurchaseOrderID
-            VALUES 
-            (1, 1, @EmployeeID, @VendorID, @ShipMethodID, @OrderDate, @ShipDate, @SubTotal, @TaxAmt, 0)", conn);
+                var groupedByVendor = invoiceTable.AsEnumerable()
+                    .GroupBy(r => r.Field<int>("VendorID"));
 
-                cmdHeader.Parameters.AddWithValue("@EmployeeID", employeeId);
-                cmdHeader.Parameters.AddWithValue("@VendorID", vendorId);
-                cmdHeader.Parameters.AddWithValue("@ShipMethodID", shipMethodId);
-                cmdHeader.Parameters.AddWithValue("@OrderDate", orderDate);
-                cmdHeader.Parameters.AddWithValue("@ShipDate", orderDate);
-                cmdHeader.Parameters.AddWithValue("@SubTotal", subtotal);
-                cmdHeader.Parameters.AddWithValue("@TaxAmt", taxAmount);
-
-                int poId = (int)cmdHeader.ExecuteScalar();
-
-                // Insert PurchaseOrderDetails
-                foreach (DataGridViewRow row in dataGridViewInvoiceItems.Rows)
+                foreach (var vendorGroup in groupedByVendor)
                 {
-                    if (row.IsNewRow) continue;
+                    int vendorId = vendorGroup.Key;
+                    decimal subtotal = vendorGroup.Sum(r => r.Field<decimal>("TotalPrice"));
 
-                    int qty = Convert.ToInt32(row.Cells["QuantityToReorder"].Value);
+                    SqlCommand cmdHeader = new SqlCommand(@"
+                INSERT INTO Purchasing.PurchaseOrderHeader 
+                (RevisionNumber, Status, EmployeeID, VendorID, ShipMethodID, OrderDate, ShipDate, SubTotal, TaxAmt, Freight)
+                OUTPUT INSERTED.PurchaseOrderID
+                VALUES (1, 1, @EmployeeID, @VendorID, @ShipMethodID, @OrderDate, @ShipDate, @SubTotal, @TaxAmt, 0)", conn);
 
-                    // 🛡️ Check if qty is invalid
-                    if (qty <= 0)
-                        continue; // Skip rows with zero or negative quantity
+                    cmdHeader.Parameters.AddWithValue("@EmployeeID", employeeId);
+                    cmdHeader.Parameters.AddWithValue("@VendorID", vendorId);
+                    cmdHeader.Parameters.AddWithValue("@ShipMethodID", shipMethodId);
+                    cmdHeader.Parameters.AddWithValue("@OrderDate", orderDate);
+                    cmdHeader.Parameters.AddWithValue("@ShipDate", orderDate);
+                    cmdHeader.Parameters.AddWithValue("@SubTotal", subtotal);
+                    cmdHeader.Parameters.AddWithValue("@TaxAmt", taxAmount);
 
-                    int productId = Convert.ToInt32(row.Cells["ProductID"].Value);
-                    string unitStr = row.Cells["UnitPrice"].Value.ToString().Replace("€", "").Replace("$", "").Trim();
-                    if (!decimal.TryParse(unitStr, out decimal unitPrice)) unitPrice = 0;
+                    int poId = (int)cmdHeader.ExecuteScalar();
 
-                    SqlCommand cmdDetail = new SqlCommand(@"
-                INSERT INTO Purchasing.PurchaseOrderDetail 
-                (PurchaseOrderID, DueDate, OrderQty, ProductID, UnitPrice, ReceivedQty, RejectedQty)
-                VALUES 
-                (@POID, @DueDate, @Qty, @ProductID, @UnitPrice, 0, 0)", conn);
+                    foreach (var row in vendorGroup)
+                    {
+                        int productId = row.Field<int>("ProductID");
+                        int qty = row.Field<int>("QuantityToReorder");
+                        decimal unitPrice = row.Field<decimal>("UnitPrice");
 
-                    cmdDetail.Parameters.AddWithValue("@POID", poId);
-                    cmdDetail.Parameters.AddWithValue("@DueDate", dueDate);
-                    cmdDetail.Parameters.AddWithValue("@Qty", qty);
-                    cmdDetail.Parameters.AddWithValue("@ProductID", productId);
-                    cmdDetail.Parameters.AddWithValue("@UnitPrice", unitPrice);
-                    cmdDetail.ExecuteNonQuery();
+                        if (qty <= 0) continue;
+
+                        SqlCommand cmdDetail = new SqlCommand(@"
+                    INSERT INTO Purchasing.PurchaseOrderDetail 
+                    (PurchaseOrderID, DueDate, OrderQty, ProductID, UnitPrice, ReceivedQty, RejectedQty)
+                    VALUES (@POID, @DueDate, @Qty, @ProductID, @UnitPrice, 0, 0)", conn);
+
+                        cmdDetail.Parameters.AddWithValue("@POID", poId);
+                        cmdDetail.Parameters.AddWithValue("@DueDate", dueDate);
+                        cmdDetail.Parameters.AddWithValue("@Qty", qty);
+                        cmdDetail.Parameters.AddWithValue("@ProductID", productId);
+                        cmdDetail.Parameters.AddWithValue("@UnitPrice", unitPrice);
+                        cmdDetail.ExecuteNonQuery();
+                    }
                 }
             }
 
-            MessageBox.Show("Purchase Order created successfully and awaiting approval!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Purchase Orders created per supplier successfully and awaiting approval!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             MainForm MainForm = new MainForm();
             MainForm.Show();
             this.Hide();
         }
 
 
-    }
+
+        }
 }

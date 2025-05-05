@@ -77,13 +77,26 @@ namespace SokProodos
                 {
                     connection.Open();
                     string query = @"
-            SELECT 
-                p.ProductID,
-                p.Name AS ProductName,
-                ISNULL(pi.Quantity, 0) AS StockQuantity
-            FROM Production.Product p
-            LEFT JOIN Production.ProductInventory pi ON p.ProductID = pi.ProductID
-            WHERE p.ProductID = @ProductID;";
+                SELECT 
+                    p.ProductID,
+                    p.Name AS ProductName,
+                    ISNULL(pi.Quantity, 0) AS StockQuantity,
+                    p.Color,
+                    p.Size,
+                    p.Weight,
+                    p.ReorderPoint,
+                    p.SafetyStockLevel,
+                    p.DaysToManufacture,
+                    ps.Name AS Category,
+                    pm.Name AS Model,
+                    v.Name AS SupplierName
+                FROM Production.Product p
+                LEFT JOIN Production.ProductInventory pi ON p.ProductID = pi.ProductID
+                LEFT JOIN Production.ProductSubcategory ps ON p.ProductSubcategoryID = ps.ProductSubcategoryID
+                LEFT JOIN Production.ProductModel pm ON p.ProductModelID = pm.ProductModelID
+                LEFT JOIN Purchasing.ProductVendor pv ON p.ProductID = pv.ProductID
+                LEFT JOIN Purchasing.Vendor v ON pv.BusinessEntityID = v.BusinessEntityID
+                WHERE p.ProductID = @ProductID;";
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {

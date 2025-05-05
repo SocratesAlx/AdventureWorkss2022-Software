@@ -68,6 +68,8 @@
             this.buttonUpdate = new System.Windows.Forms.Button();
             this.buttonFill = new System.Windows.Forms.Button();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.comboBoxSupplier = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -93,7 +95,7 @@
             // 
             this.labelProductNumber.AutoSize = true;
             this.labelProductNumber.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelProductNumber.Location = new System.Drawing.Point(27, 307);
+            this.labelProductNumber.Location = new System.Drawing.Point(25, 307);
             this.labelProductNumber.Name = "labelProductNumber";
             this.labelProductNumber.Size = new System.Drawing.Size(124, 20);
             this.labelProductNumber.TabIndex = 2;
@@ -110,7 +112,7 @@
             // 
             this.labelColor.AutoSize = true;
             this.labelColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelColor.Location = new System.Drawing.Point(27, 120);
+            this.labelColor.Location = new System.Drawing.Point(25, 120);
             this.labelColor.Name = "labelColor";
             this.labelColor.Size = new System.Drawing.Size(46, 20);
             this.labelColor.TabIndex = 4;
@@ -306,6 +308,8 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.comboBoxSupplier);
+            this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.comboBoxFinishedGoodsFlag);
             this.groupBox1.Controls.Add(this.comboBoxMakeFlag);
             this.groupBox1.Controls.Add(this.labelFinishedGoodsFlag);
@@ -388,7 +392,7 @@
             // 
             this.labelProductID.AutoSize = true;
             this.labelProductID.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelProductID.Location = new System.Drawing.Point(27, 78);
+            this.labelProductID.Location = new System.Drawing.Point(25, 78);
             this.labelProductID.Name = "labelProductID";
             this.labelProductID.Size = new System.Drawing.Size(85, 20);
             this.labelProductID.TabIndex = 30;
@@ -473,6 +477,25 @@
             this.pictureBox1.TabIndex = 29;
             this.pictureBox1.TabStop = false;
             // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(25, 344);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(67, 20);
+            this.label2.TabIndex = 37;
+            this.label2.Text = "Supplier";
+            // 
+            // comboBoxSupplier
+            // 
+            this.comboBoxSupplier.FormattingEnabled = true;
+            this.comboBoxSupplier.Location = new System.Drawing.Point(152, 344);
+            this.comboBoxSupplier.Name = "comboBoxSupplier";
+            this.comboBoxSupplier.Size = new System.Drawing.Size(132, 24);
+            this.comboBoxSupplier.TabIndex = 38;
+            this.comboBoxSupplier.SelectedIndexChanged += new System.EventHandler(this.comboBoxSupplier_SelectedIndexChanged);
+            // 
             // StockForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -536,5 +559,7 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.ComboBox comboBoxFinishedGoodsFlag;
         private System.Windows.Forms.ComboBox comboBoxMakeFlag;
+        private System.Windows.Forms.ComboBox comboBoxSupplier;
+        private System.Windows.Forms.Label label2;
     }
 }

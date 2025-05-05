@@ -215,7 +215,7 @@ namespace SokProodos
         {
             dataGridViewReorderProducts.Columns.Clear();
 
-            // Select Checkbox (for batch reorder)
+            
             DataGridViewCheckBoxColumn colSelect = new DataGridViewCheckBoxColumn
             {
                 Name = "Select",
@@ -336,7 +336,7 @@ namespace SokProodos
                 }
                 else
                 {
-                    // ✅ Όσα δεν χρειάζονται αναπαραγγελία να είναι λευκά
+                    
                     row.DefaultCellStyle.BackColor = Color.White;
                     row.DefaultCellStyle.ForeColor = Color.Black;
                 }

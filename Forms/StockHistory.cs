@@ -118,14 +118,17 @@ namespace SokProodos
                 {
                     connection.Open();
                     string query = @"
-            SELECT 
-                p.ProductID, 
-                p.Name AS ProductName, 
-                ISNULL(pi.Quantity, 0) AS StockQuantity,
-                pi.ModifiedDate
-            FROM Production.Product p
-            LEFT JOIN Production.ProductInventory pi ON p.ProductID = pi.ProductID
-            WHERE 1 = 1";
+                SELECT 
+                    p.ProductID, 
+                    p.Name AS ProductName, 
+                    ISNULL(pi.Quantity, 0) AS StockQuantity,
+                    pi.ModifiedDate,
+                    v.Name AS SupplierName
+                FROM Production.Product p
+                LEFT JOIN Production.ProductInventory pi ON p.ProductID = pi.ProductID
+                LEFT JOIN Purchasing.ProductVendor pv ON p.ProductID = pv.ProductID
+                LEFT JOIN Purchasing.Vendor v ON pv.BusinessEntityID = v.BusinessEntityID
+                WHERE 1 = 1";
 
                     if (!string.IsNullOrWhiteSpace(productNameFilter))
                         query += " AND p.Name LIKE @ProductName";

@@ -16,15 +16,15 @@ namespace SokProodos
     {
         public StockForm()
         {
-            InitializeComponent();
+            InitializeComponent();          
             LoadProductCategories();
             LoadProductModels();
             LoadSpecialOffers();
+            LoadSuppliers();
             this.StartPosition = FormStartPosition.CenterScreen;
             comboBoxMakeFlag.Items.AddRange(new string[] { "Yes", "No" });
             comboBoxMakeFlag.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxMakeFlag.SelectedIndex = 1; // Default = No
-
             comboBoxFinishedGoodsFlag.Items.AddRange(new string[] { "Yes", "No" });
             comboBoxFinishedGoodsFlag.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxFinishedGoodsFlag.SelectedIndex = 1;
@@ -70,7 +70,33 @@ namespace SokProodos
             }
         }
 
+        private void InsertVendorProduct(SqlConnection connection, int productId, int vendorId, decimal standardCost)
+        {
+            try
+            {
+                string insertVendorProductQuery = @"
+        INSERT INTO Purchasing.ProductVendor 
+        (ProductID, BusinessEntityID, AverageLeadTime, StandardPrice, MinOrderQty, MaxOrderQty, UnitMeasureCode, ModifiedDate)
+        VALUES 
+        (@ProductID, @VendorID, 10, @StandardPrice, @MinOrderQty, @MaxOrderQty, @UnitMeasureCode, GETDATE());";
 
+                using (SqlCommand vendorCmd = new SqlCommand(insertVendorProductQuery, connection))
+                {
+                    vendorCmd.Parameters.AddWithValue("@ProductID", productId);
+                    vendorCmd.Parameters.AddWithValue("@VendorID", vendorId);
+                    vendorCmd.Parameters.AddWithValue("@StandardPrice", standardCost);
+                    vendorCmd.Parameters.AddWithValue("@MinOrderQty", 1);         // Default minimum order quantity
+                    vendorCmd.Parameters.AddWithValue("@MaxOrderQty", 1000);      // Default maximum order quantity
+                    vendorCmd.Parameters.AddWithValue("@UnitMeasureCode", "EA");  // Default unit measure (Each)
+
+                    vendorCmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error linking product with vendor: " + ex.Message, "Vendor Insert Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
 
         private void Button_MouseEnter(object sender, EventArgs e)
@@ -221,6 +247,8 @@ namespace SokProodos
 
                     MessageBox.Show("Product and stock added successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
+
+
                     
                     textBoxProductName.Clear();
                     textBoxProductNumber.Clear();
@@ -244,8 +272,33 @@ namespace SokProodos
             }
         }
 
+        private void LoadSuppliers()
+        {
+            string connectionString = @"Server=SOCHAX\SQLEXPRESS;Database=AdventureWorks2022;Trusted_Connection=True;";
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = "SELECT BusinessEntityID, Name FROM Purchasing.Vendor ORDER BY Name";
 
+                    DataTable table = new DataTable();
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(query, conn))
+                    {
+                        adapter.Fill(table);
+                    }
 
+                    comboBoxSupplier.DataSource = table;
+                    comboBoxSupplier.DisplayMember = "Name";
+                    comboBoxSupplier.ValueMember = "BusinessEntityID";
+                    comboBoxSupplier.SelectedIndex = -1; // Optional: no selection by default
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error loading suppliers: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
 
 
         private void buttonSaveProduct_Click(object sender, EventArgs e)
@@ -260,8 +313,10 @@ namespace SokProodos
             bool makeFlag = comboBoxMakeFlag.SelectedItem.ToString() == "Yes";
             bool finishedGoodsFlag = comboBoxFinishedGoodsFlag.SelectedItem.ToString() == "Yes";
 
-            int subcategoryId = comboBoxCategory.SelectedItem != null ? ((KeyValuePair<int, string>)comboBoxCategory.SelectedItem).Key : 0;
-            int modelId = comboBoxModel.SelectedItem != null ? ((KeyValuePair<int, string>)comboBoxModel.SelectedItem).Key : 0;
+            int subcategoryId = comboBoxCategory.SelectedValue != null ? Convert.ToInt32(comboBoxCategory.SelectedValue) : 0;
+            int modelId = comboBoxModel.SelectedValue != null ? Convert.ToInt32(comboBoxModel.SelectedValue) : 0;
+            int vendorId = comboBoxSupplier.SelectedValue != null ? Convert.ToInt32(comboBoxSupplier.SelectedValue) : 0;
+
 
             if (string.IsNullOrWhiteSpace(productName) || string.IsNullOrWhiteSpace(productNumber))
             {
@@ -308,6 +363,7 @@ namespace SokProodos
                 {
                     connection.Open();
 
+                    // Insert Product
                     string insertProductQuery = @"
             INSERT INTO Production.Product 
             (Name, ProductNumber, Color, StandardCost, ListPrice, Size, Weight, SafetyStockLevel, 
@@ -338,17 +394,14 @@ namespace SokProodos
                         newProductId = Convert.ToInt32(command.ExecuteScalar());
                     }
 
-                    
-                    textBoxProductID.Text = newProductId.ToString();
-
-                    
+                    // Insert Inventory
                     if (initialStockQuantity > 0)
                     {
                         string insertInventoryQuery = @"
-                    INSERT INTO Production.ProductInventory 
-                    (ProductID, LocationID, Shelf, Bin, Quantity, ModifiedDate)
-                    VALUES 
-                    (@ProductID, 1, 'A', 1, @Quantity, GETDATE());";
+                INSERT INTO Production.ProductInventory 
+                (ProductID, LocationID, Shelf, Bin, Quantity, ModifiedDate)
+                VALUES 
+                (@ProductID, 1, 'A', 1, @Quantity, GETDATE());";
 
                         using (SqlCommand inventoryCommand = new SqlCommand(insertInventoryQuery, connection))
                         {
@@ -358,7 +411,28 @@ namespace SokProodos
                         }
                     }
 
-                    MessageBox.Show("Product and stock added successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    // Insert Special Offer
+                    if (specialOfferId > 0)
+                    {
+                        string insertSpecialOfferQuery = @"
+                INSERT INTO Sales.SpecialOfferProduct (SpecialOfferID, ProductID)
+                VALUES (@SpecialOfferID, @ProductID);";
+
+                        using (SqlCommand specialOfferCommand = new SqlCommand(insertSpecialOfferQuery, connection))
+                        {
+                            specialOfferCommand.Parameters.AddWithValue("@ProductID", newProductId);
+                            specialOfferCommand.Parameters.AddWithValue("@SpecialOfferID", specialOfferId);
+                            specialOfferCommand.ExecuteNonQuery();
+                        }
+                    }
+
+                    // Insert ProductVendor
+                    if (vendorId > 0)
+                    {
+                        InsertVendorProduct(connection, newProductId, vendorId, standardCost);
+                    }
+
+                    MessageBox.Show("Product, stock, offer and supplier linked successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 catch (Exception ex)
                 {
@@ -366,9 +440,6 @@ namespace SokProodos
                 }
             }
         }
-
-
-
 
 
 
@@ -596,6 +667,11 @@ namespace SokProodos
         }
 
         private void textBoxFinishedGoodsFlag_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBoxSupplier_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }

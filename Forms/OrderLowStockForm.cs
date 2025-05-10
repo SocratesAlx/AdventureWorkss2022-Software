@@ -33,6 +33,9 @@ namespace SokProodos
             this.comboBoxShipMethod.SelectedIndexChanged += new System.EventHandler(this.comboBoxShipMethod_SelectedIndexChanged);
             this.textBoxTaxAmount.TextChanged += new System.EventHandler(this.textBoxTaxAmount_TextChanged);
             dataGridViewInvoiceItems.CellValueChanged += dataGridViewInvoiceItems_CellValueChanged;
+            dataGridViewInvoiceItems.DataBindingComplete += dataGridViewInvoiceItems_DataBindingComplete;
+            dataGridViewInvoiceItems.CellBeginEdit += dataGridViewInvoiceItems_CellBeginEdit;
+
         }
         private void OrderLowStockForm_Load(object sender, EventArgs e)
         {
@@ -40,6 +43,22 @@ namespace SokProodos
             LoadEmployees();
             LoadShipMethods();
         }
+
+        private void dataGridViewInvoiceItems_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            HighlightTotalRow();
+        }
+
+        private void dataGridViewInvoiceItems_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            var row = dataGridViewInvoiceItems.Rows[e.RowIndex];
+            if (row.Cells["Name"].Value?.ToString() == "TOTAL")
+            {
+                e.Cancel = true;
+            }
+        }
+
+
 
         private void SetOrderDate()
         {
@@ -151,7 +170,7 @@ namespace SokProodos
                     string vendorName = "Unknown Vendor";
                     int vendorId = -1;
 
-                    // Get unit price
+                    
                     using (SqlCommand cmdPrice = new SqlCommand("SELECT ListPrice FROM Production.Product WHERE ProductID = @ProductID", conn))
                     {
                         cmdPrice.Parameters.AddWithValue("@ProductID", productId);
@@ -162,7 +181,7 @@ namespace SokProodos
                         }
                     }
 
-                    // Get vendor info
+                    
                     using (SqlCommand cmdVendor = new SqlCommand(@"
                 SELECT TOP 1 v.BusinessEntityID, v.Name
                 FROM Purchasing.ProductVendor pv
@@ -202,6 +221,7 @@ namespace SokProodos
                 dataGridViewInvoiceItems.Columns["VendorID"].Visible = false;
 
             UpdateTotalCostLabel();
+            UpdateTotalRow();
         }
 
 
@@ -219,6 +239,22 @@ namespace SokProodos
                 row["TotalPrice"] = qty * unitPrice;
 
                 UpdateTotalCostLabel();
+                UpdateTotalRow();
+            }
+        }
+
+        private void HighlightTotalRow()
+        {
+            foreach (DataGridViewRow row in dataGridViewInvoiceItems.Rows)
+            {
+                if (row.Cells["Name"].Value?.ToString() == "TOTAL")
+                {
+                    row.DefaultCellStyle.BackColor = Color.FromArgb(100, 200, 100); // Soft green
+                    row.DefaultCellStyle.ForeColor = Color.White;
+                    row.DefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+                    row.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    row.DefaultCellStyle.Padding = new Padding(4, 4, 4, 4);
+                }
             }
         }
 
@@ -226,6 +262,7 @@ namespace SokProodos
         private void UpdateTotalCostLabel()
         {
             decimal subtotal = invoiceTable.AsEnumerable()
+                .Where(r => r["Name"].ToString() != "TOTAL")
                 .Sum(r => r.Field<decimal>("TotalPrice"));
 
             decimal tax = 0;
@@ -237,9 +274,11 @@ namespace SokProodos
         }
 
 
+
         private void textBoxTaxAmount_TextChanged(object sender, EventArgs e)
         {
             UpdateTotalCostLabel();
+            UpdateTotalRow();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -302,6 +341,33 @@ namespace SokProodos
                     grid.Rows[e.RowIndex].DefaultCellStyle.BackColor = altBack;
                 }
             };
+        }
+
+        private void UpdateTotalRow()
+        {
+            
+            var existingTotalRow = invoiceTable.AsEnumerable()
+                .FirstOrDefault(r => r["Name"].ToString() == "TOTAL");
+
+            if (existingTotalRow != null)
+                invoiceTable.Rows.Remove(existingTotalRow);
+
+            
+            decimal subtotal = invoiceTable.AsEnumerable()
+                .Where(r => r["Name"].ToString() != "TOTAL")
+                .Sum(r => r.Field<decimal>("TotalPrice"));
+
+            decimal.TryParse(textBoxTaxAmount.Text.Replace("€", "").Replace("$", "").Trim(), out decimal tax);
+            decimal finalTotal = subtotal + tax;
+
+            
+            DataRow totalRow = invoiceTable.NewRow();
+            totalRow["Name"] = "TOTAL";
+            totalRow["TotalPrice"] = finalTotal;
+
+            invoiceTable.Rows.Add(totalRow);
+
+            HighlightTotalRow();
         }
 
 

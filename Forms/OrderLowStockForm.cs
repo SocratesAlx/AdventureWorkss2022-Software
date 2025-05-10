@@ -128,6 +128,7 @@ namespace SokProodos
             invoiceTable = new DataTable();
             invoiceTable.Columns.Add("ProductID", typeof(int));
             invoiceTable.Columns.Add("Name", typeof(string));
+            invoiceTable.Columns.Add("VendorID", typeof(int)); // ✅ New column
             invoiceTable.Columns.Add("VendorName", typeof(string));
             invoiceTable.Columns.Add("Quantity", typeof(int));
             invoiceTable.Columns.Add("QuantityToReorder", typeof(int));
@@ -148,8 +149,9 @@ namespace SokProodos
                     int quantityToReorder = Convert.ToInt32(row["QuantityToReorder"]);
                     decimal unitPrice = 0;
                     string vendorName = "Unknown Vendor";
+                    int vendorId = -1;
 
-                    
+                    // Get unit price
                     using (SqlCommand cmdPrice = new SqlCommand("SELECT ListPrice FROM Production.Product WHERE ProductID = @ProductID", conn))
                     {
                         cmdPrice.Parameters.AddWithValue("@ProductID", productId);
@@ -160,39 +162,48 @@ namespace SokProodos
                         }
                     }
 
-                    
+                    // Get vendor info
                     using (SqlCommand cmdVendor = new SqlCommand(@"
-                SELECT TOP 1 v.Name
+                SELECT TOP 1 v.BusinessEntityID, v.Name
                 FROM Purchasing.ProductVendor pv
                 INNER JOIN Purchasing.Vendor v ON pv.BusinessEntityID = v.BusinessEntityID
                 WHERE pv.ProductID = @ProductID
                 ORDER BY pv.StandardPrice ASC", conn))
                     {
                         cmdVendor.Parameters.AddWithValue("@ProductID", productId);
-                        object vendorResult = cmdVendor.ExecuteScalar();
-                        if (vendorResult != null && vendorResult != DBNull.Value)
+
+                        using (SqlDataReader reader = cmdVendor.ExecuteReader())
                         {
-                            vendorName = vendorResult.ToString();
+                            if (reader.Read())
+                            {
+                                vendorId = Convert.ToInt32(reader["BusinessEntityID"]);
+                                vendorName = reader["Name"].ToString();
+                            }
                         }
                     }
 
                     decimal totalPrice = unitPrice * quantityToReorder;
                     totalCost += totalPrice;
 
-                    invoiceTable.Rows.Add(productId, name, vendorName, quantity, quantityToReorder, unitPrice, totalPrice);
+                    invoiceTable.Rows.Add(productId, name, vendorId, vendorName, quantity, quantityToReorder, unitPrice, totalPrice);
                 }
             }
 
             dataGridViewInvoiceItems.DataSource = invoiceTable;
 
-            // Make all columns readonly except QuantityToReorder
+            // Set column visibility and readonly status
             foreach (DataGridViewColumn col in dataGridViewInvoiceItems.Columns)
                 col.ReadOnly = true;
 
             dataGridViewInvoiceItems.Columns["QuantityToReorder"].ReadOnly = false;
 
+            // Optional: Hide VendorID column from UI
+            if (dataGridViewInvoiceItems.Columns.Contains("VendorID"))
+                dataGridViewInvoiceItems.Columns["VendorID"].Visible = false;
+
             UpdateTotalCostLabel();
         }
+
 
 
 

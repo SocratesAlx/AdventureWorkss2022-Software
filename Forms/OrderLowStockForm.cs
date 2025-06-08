@@ -454,11 +454,21 @@ namespace SokProodos
                 decimal.TryParse(textBoxTaxAmount.Text.Replace("€", "").Replace("$", "").Trim(), out decimal taxAmount);
 
                 var groupedByVendor = invoiceTable.AsEnumerable()
-                    .GroupBy(r => r.Field<int>("VendorID"));
+    .Where(r => r["Name"].ToString() != "TOTAL" && r["VendorID"] != DBNull.Value && Convert.ToInt32(r["VendorID"]) != -1)
+    .GroupBy(r => r.Field<int>("VendorID"));
+
+
 
                 foreach (var vendorGroup in groupedByVendor)
                 {
                     int vendorId = vendorGroup.Key;
+                    if (vendorId == -1)
+                    {
+                        // Log or show warning if needed
+                        continue;
+                    }
+
+
                     decimal subtotal = vendorGroup.Sum(r => r.Field<decimal>("TotalPrice"));
 
                     SqlCommand cmdHeader = new SqlCommand(@"

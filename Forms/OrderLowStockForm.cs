@@ -464,7 +464,7 @@ namespace SokProodos
                     int vendorId = vendorGroup.Key;
                     if (vendorId == -1)
                     {
-                        // Log or show warning if needed
+                        
                         continue;
                     }
 

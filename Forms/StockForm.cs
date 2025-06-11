@@ -24,7 +24,7 @@ namespace SokProodos
             this.StartPosition = FormStartPosition.CenterScreen;
             comboBoxMakeFlag.Items.AddRange(new string[] { "Yes", "No" });
             comboBoxMakeFlag.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBoxMakeFlag.SelectedIndex = 1; // Default = No
+            comboBoxMakeFlag.SelectedIndex = 1; 
             comboBoxFinishedGoodsFlag.Items.AddRange(new string[] { "Yes", "No" });
             comboBoxFinishedGoodsFlag.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxFinishedGoodsFlag.SelectedIndex = 1;
@@ -85,9 +85,9 @@ namespace SokProodos
                     vendorCmd.Parameters.AddWithValue("@ProductID", productId);
                     vendorCmd.Parameters.AddWithValue("@VendorID", vendorId);
                     vendorCmd.Parameters.AddWithValue("@StandardPrice", standardCost);
-                    vendorCmd.Parameters.AddWithValue("@MinOrderQty", 1);         // Default minimum order quantity
-                    vendorCmd.Parameters.AddWithValue("@MaxOrderQty", 1000);      // Default maximum order quantity
-                    vendorCmd.Parameters.AddWithValue("@UnitMeasureCode", "EA");  // Default unit measure (Each)
+                    vendorCmd.Parameters.AddWithValue("@MinOrderQty", 1);         
+                    vendorCmd.Parameters.AddWithValue("@MaxOrderQty", 1000);      
+                    vendorCmd.Parameters.AddWithValue("@UnitMeasureCode", "EA");  
 
                     vendorCmd.ExecuteNonQuery();
                 }
@@ -291,7 +291,7 @@ namespace SokProodos
                     comboBoxSupplier.DataSource = table;
                     comboBoxSupplier.DisplayMember = "Name";
                     comboBoxSupplier.ValueMember = "BusinessEntityID";
-                    comboBoxSupplier.SelectedIndex = -1; // Optional: no selection by default
+                    comboBoxSupplier.SelectedIndex = -1; 
                 }
                 catch (Exception ex)
                 {
